@@ -1,16 +1,84 @@
 import React from "react";
-import { Image, StyleSheet, TextInput, View } from "react-native";
-import { Button } from "react-native-paper";
+import { Alert, Image, StyleSheet, TextInput, View } from "react-native";
+import { ActivityIndicator, Colors } from 'react-native-paper';
+import { Button, Dialog } from "react-native-paper";
+import firebase from "firebase"
 import logo from "../images/logo.png"
 
 
-export default function Homepage({ route, navigation }) {
+export default function login({ route, navigation }) {
 
     const [username, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
 
     function handleNavigateToRegister() {
-        navigation.navigate('Register')
+        let usernameFromDB = false
+        if (!username || !password) {
+            Dialog("Erro", "Preencha os campos corretamente!");        
+            } else {
+                var ref = firebase.database().ref("users");
+      
+                ref.on("value", function (snapshot) {
+                snapshot.forEach((usuarios) => {
+                    if (username == usuarios.val().username) {
+                        usernameFromDB = true;
+                    }
+                })
+                }, function (error) {
+                console.log("Error: " + error.code);
+                });
+
+                if (usernameFromDB) {
+                    Alert.alert("Erro", "Username já cadastrado. Faça login ou crie uma conta com outro username.")
+                } else {
+                    navigation.navigate('Register', {username, password})
+                }                
+            }
+    };
+
+    function handleLogin() {
+        let usernameFromDB = false
+        let emailFromDB = "";
+        if (!username || !password) {
+            Alert.alert("Erro", "Preencha os campos corretamente!");
+      
+          } else {
+            var ref = firebase.database().ref("users");
+      
+            ref.on("value", function (snapshot) {
+              snapshot.forEach((users) => {
+                if (username == users.val().username) {
+                    usernameFromDB = true;
+                    emailFromDB = users.val().email
+                    console.log(emailFromDB)
+                }
+              })
+            }, function (error) {
+              console.log("Error: " + error.code);
+            });
+
+            if (!usernameFromDB) {
+                Alert.alert("Erro", "Insira um username já cadastrado, ou então, cadastre-se.")
+            } else {
+
+            <ActivityIndicator animating={true} color={Colors.red800} />
+                firebase
+                .auth()
+                .signInWithEmailAndPassword(emailFromDB, password)
+                .then(() => {
+                    const user = firebase.auth().currentUser;
+        
+                    if (!user.emailVerified) {
+                    firebase.auth().signOut().then(Alert.alert("Erro!", "Por favor, verifique seu e-mail antes de fazer login!"))
+                    } else {
+                        navigation.navigate("MainScreen")
+                    }
+                  })
+                  .catch(error => {
+                    Alert.alert(`Erro ${error.code}`, `${error.message}`)
+                  })
+            }
+        }
     }
     
     return (
@@ -18,7 +86,6 @@ export default function Homepage({ route, navigation }) {
             <Image source={logo} style={styles.logo}></Image>
             <TextInput
                 name="Nome"
-                label="João"
                 placeholder="Username"
                 type='outlined'
                 style={styles.input}
@@ -31,7 +98,6 @@ export default function Homepage({ route, navigation }) {
 
             <TextInput
                 name="Nome"
-                label="João"
                 placeholder="Senha"
                 type='outlined'
                 style={styles.input}
@@ -43,7 +109,7 @@ export default function Homepage({ route, navigation }) {
                 
             />
             
-            <Button icon="login" mode="contained" style={styles.button} dark={true} onPress={() => {console.log(username, password)}}>
+            <Button icon="login" mode="contained" style={styles.button} dark={true} onPress={handleLogin}>
                 Entrar
             </Button>
             <Button icon="account-plus" mode="contained" style={styles.button} dark={true} onPress={handleNavigateToRegister} >

@@ -1,40 +1,78 @@
 import React from "react";
-import { Image, StyleSheet, TextInput, View } from "react-native";
+import { Image, StyleSheet, TextInput, View, Slider, Text, Alert } from "react-native";
 import { Button } from "react-native-paper";
+import Fire from "../../components/Fire"
+import firebase from "firebase"
 import logo from "../../images/logo.png"
 
 
-export default function Homepage({ route, navigation }) {
+export default function range({ route, navigation }) {
 
-    const [name, setName] = React.useState('');
-    const [whatsapp, setWhatsapp] = React.useState('');
+    const { username, password, name, email, tel, lat, lng } = route.params;
 
-    function handleNavigateToMapView() {
-        navigation.navigate('MapView')
+    console.log(username, password, name, tel, lat, lng)
+
+    const [range, setRange] = React.useState(100);
+
+    async function handleNavigateToHomepage() {
+        try {
+            await firebase
+                .auth()
+                .createUserWithEmailAndPassword(email, password)
+                .then(() => {
+                    var user = firebase.auth().currentUser;
+
+                    user.sendEmailVerification().then(function () {
+                        Alert.alert("Verificação", "Por favor, clique no link que enviamos para seu e-mail para autenticar sua conta!")
+                        navigation.navigate("Login")
+                    }).catch(function (error) {
+                    console.log(error)
+                    })
+                });
+
+            Fire.save("users", {
+                username,
+                name,
+                email,
+                tel,
+                location: {
+                    lat,
+                    lng
+                },
+            });
+        } catch (error) {
+            console.log(error.code, error.message);
+        }
     }
+    
     
     return (
         <View style={styles.container}>
             <Image source={logo} style={styles.logo}></Image>
-            <TextInput
-                name="Nome"
-                label="João"
-                placeholder="Número de Whatsapp"
-                type='outlined'
-                style={styles.input}
-                value={whatsapp}
-                onChangeText={whatsapp => setWhatsapp(whatsapp)}
-                color="#000000"
-                backgroundColor="#fff"
-                
+            <Text style={styles.text}>
+                Deseja receber oportunidades de escambo em um raio de quantos quilômetros?
+            </Text>
+            <Slider
+                style={styles.slider}
+                maximumValue={1000}
+                minimumValue={1}
+                step={1}
+                minimumTrackTintColor="#000"
+                value={range}
+                onValueChange={range => setRange(range)}
+                thumbTintColor="#000"
             />
+            <Text style={styles.text}>
+                {range} km
+            </Text>
             
-            <Button icon="login" mode="contained" style={styles.button} dark={true} onPress={handleNavigateToMapView}>
-                Continuar
+            <Button icon="arrow-right-bold" mode="contained" style={styles.button} dark={true} onPress={handleNavigateToHomepage}>
+                Criar conta
             </Button>
         </View>
     )
 }
+
 
 const styles = StyleSheet.create({
     container: {
@@ -47,6 +85,16 @@ const styles = StyleSheet.create({
         marginBottom: 30,
         width: "90%",
         maxHeight: 100
+    },
+
+    text: {
+        fontSize: 19,
+        textAlign:"center",
+        marginBottom: 10
+    },
+
+    slider: {
+        width: "65%",
     },
 
     input: {
