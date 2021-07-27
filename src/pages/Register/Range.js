@@ -6,7 +6,7 @@ import firebase from "firebase"
 import logo from "../../images/logo.png"
 
 
-export default function range({ route, navigation }) {
+export default function Range({ route, navigation }) {
 
     const { username, password, name, email, tel, lat, lng } = route.params;
 

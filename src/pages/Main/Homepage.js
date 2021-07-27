@@ -74,8 +74,8 @@ const styles = StyleSheet.create({
     },
     
     safeAreaView: {
-        marginTop: "-5%",
-        alignItems: "flex-end",
+        marginTop: "-8%",
+        alignItems: "flex-start",
         justifyContent: "center"
     },
     
@@ -86,13 +86,13 @@ const styles = StyleSheet.create({
     
     searchBar: {   
         width: "80%",
-        marginBottom: "2%",
+        marginVertical: "2%",
         alignSelf: "center"
     },
 
     card: {
         marginHorizontal: "10%",
-        marginBottom: 10,
+        marginBottom: "2%",
         width: "80%",
         backgroundColor: "#ffd731"
     },
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 28,
         color: "#000000",
-        marginVertical: 10
+        marginVertical: "2%"
     },
 
     cardParagraph: {

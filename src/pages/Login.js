@@ -83,7 +83,7 @@ export default function login({ route, navigation }) {
     
     return (
         <View style={styles.container}>
-            <Image source={logo} style={styles.logo}></Image>
+            <Image source={logo} style={styles.logo} />
             <TextInput
                 name="Nome"
                 placeholder="Username"

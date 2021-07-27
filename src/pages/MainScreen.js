@@ -6,6 +6,8 @@ import { IconButton, TextInput } from "react-native-paper";
 
 import Homepage from "./Main/Homepage"
 import NewPost from "./Main/NewPost"
+import MyRequests from "./Main/MyRequests";
+import TradeRequestsForMe from "./Main/TradeRequestsForMe";
 
 import Logo from "../images/logo.png"
 
@@ -22,7 +24,7 @@ export default function MainScreen({ route, navigation }) {
             headerRight: () => (
                 <IconButton
                     title="Info"
-                    color="#fff"
+                    color="#000"
                     icon="account"
                     onPress={() => {
                             navigation.navigate("Profile");
@@ -38,6 +40,7 @@ export default function MainScreen({ route, navigation }) {
             initialRouteName="Homepage"
             activeColor="#fff"
             inactiveColor="#000"
+            shifting={true}
         >
             <Tab.Screen
                 name="Homepage"
@@ -45,17 +48,40 @@ export default function MainScreen({ route, navigation }) {
                 options={({ navigation, route })=> ({
                     tabBarLabel: "Feed",
                     tabBarIcon: ({color}) => (
-                        <Icon name="home" color={color} size={26} />
+                        <Icon  name="home" color={color} size={26} />
                     )
                 })}
             />
+
             <Tab.Screen
                 name="NewPost"
                 component={NewPost}
                 options={({ navigation, route })=> ({
-                    tabBarLabel: "Novo Item",
+                    tabBarLabel: "Cadastrar Item",
                     tabBarIcon: ({color}) => (
                         <Icon name="add" color={color} size={26} />
+                    )
+                })}
+            />
+
+            <Tab.Screen
+                name="MyRequests"
+                component={MyRequests}
+                options={({ navigation, route })=> ({
+                    tabBarLabel: "Pedidos realizados",
+                    tabBarIcon: ({color}) => (
+                        <Icon name="list" color={color} size={26} />
+                    )
+                })}
+            />
+
+            <Tab.Screen
+                name="TradeRequestsForMe"
+                component={TradeRequestsForMe}
+                options={({ navigation, route })=> ({
+                    tabBarLabel: "Pedidos recebidos",
+                    tabBarIcon: ({color}) => (
+                        <Icon type="material-community" name="forum" color={color} size={24} />
                     )
                 })}
             />

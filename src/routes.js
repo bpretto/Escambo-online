@@ -20,7 +20,7 @@ const theme = {
         primary: '#ffd731',
         accent: '#000',
         background: '#ffd731',
-        text: '#fff',
+        text: '#000',
         placeholder: '#737373',
     },
 };
@@ -34,6 +34,7 @@ export default function Routes() {
                 <Navigator
                     initialRouteName="MainScreen"
                     screenOptions={{
+                        headerTintColor: 'white',
                         headerTitleAlign: "center",
                         headerTitleStyle: {
                             fontWeight: "bold",
