@@ -1,29 +1,59 @@
 import React from "react";
 import { StyleSheet, View, Text } from "react-native";
-import { Button, IconButton } from "react-native-paper";
+import { Button, Dialog, Portal, TextInput } from "react-native-paper";
+import firebase from "firebase";
 
-export default function mapView({ route, navigation }) {
-
+export default function Profile({ route, navigation }) {
+    
     React.useLayoutEffect(() => {
         navigation.setOptions({
             title: "Perfil",
-            headerRight: () => (
-                <IconButton
-                    title="Info"
-                    color="#fff"
-                    icon="account"
-                    onPress={() => {
-                            navigation.navigate("Profile");
-                    }}
-                />
-            ),
         });
     }, [navigation]);
+    
+    const [deleteVisible, setDeleteVisible] = React.useState(false);
+    const [buttonDisabled, setButtonDisabled] = React.useState(true);
+    const [inputValue, setInputValue] = React.useState("");
+
+    function handleLogOut() {
+        navigation.navigate("Login")
+        firebase.auth().signOut()
+    }
+
+    function handleNavigateToEditProfile() {
+        navigation.navigate("EditProfile")
+    }
+
+    function handleShowDialogDeleteAccount() {
+        setDeleteVisible(true)
+    }
+
+    function disabledButton(inputValue) {
+        console.log(inputValue)
+
+        if (inputValue == "excluir perfil") {
+            setButtonDisabled(false)
+        } else {
+            setButtonDisabled(true)
+        }
+    }
+
+    function handleDeleteAccount() {
+        setDeleteVisible(false)
+        const user = firebase.auth().currentUser;
+        user.delete().then(() => {
+            setDeleteVisible(false)
+            navigation.navigate("Login")
+        }).catch((error) => {
+
+        });
+        console.log("excluido!")
+    }
 
     return (
         <View style={styles.container}>
             <View style={styles.userCard}>
-                <View style={styles.column}>
+                <View>
                     <Text style={styles.labelText}>Username</Text>
                     <Text style={styles.text}>bpretto</Text>   
 
@@ -37,18 +67,22 @@ export default function mapView({ route, navigation }) {
                     <Text style={styles.text}>200km</Text>
                 </View>
 
-                <View style={styles.column}>
-                    <Button icon="account-edit" mode="contained" style={styles.buttonEdit} dark={true} onPress={console.log("pressed")}>
+                <View>
+                    <Button icon="logout" mode="contained" style={styles.buttonLogOut} dark={true} onPress={handleLogOut}>
+                            Sair
+                    </Button>
+
+                    <Button icon="account-edit" mode="contained" style={styles.buttonEdit} dark={true} onPress={handleNavigateToEditProfile}>
                             Editar
                     </Button>
 
-                    <Button icon="delete-empty" mode="contained" style={styles.buttonDelete} dark={true} onPress={console.log("pressed")}>
+                    <Button icon="delete-empty" mode="contained" style={styles.buttonDelete} dark={true} onPress={handleShowDialogDeleteAccount}>
                             Excluir
                     </Button>
                 </View>
             </View>
 
-            <Text style={styles.title}>Meus pedidos de troca</Text>
+            <Text style={styles.title}>Meus itens</Text>
 
             <View style={styles.card}>
                 <View style={styles.columnLeft}>
@@ -87,6 +121,31 @@ export default function mapView({ route, navigation }) {
                     </View>                    
                 </View>
             </View>
+
+            <Portal>
+                <Dialog visible={deleteVisible} dismissable={true} onDismiss={()=>setDeleteVisible(false)}>
+                    <Dialog.Title>Você tem certeza?</Dialog.Title>
+                    <Dialog.Content>
+                        <TextInput
+                            style={styles.inputDialog}
+                            value={inputValue}
+                            onChangeText={(inputValue) => {setInputValue(inputValue); disabledButton(inputValue)}}
+                            placeholder='Digite "excluir perfil"'
+                        />
+                        <Button
+                            icon="delete-empty"
+                            disabled={buttonDisabled}
+                            mode="contained"
+                            style={styles.buttonDeleteDialog}
+                            dark={true}
+                            onPress={handleDeleteAccount}
+                        >
+                            Excluir
+                        </Button>
+                    </Dialog.Content>
+                </Dialog>
+            </Portal>
+            
         </View>
     )
 }
@@ -121,6 +180,11 @@ const styles = StyleSheet.create({
         color: "#fff"
     },
 
+    buttonLogOut : {
+        backgroundColor:"cornflowerblue",
+        marginBottom: "5%"
+    },
+
     buttonEdit : {
         backgroundColor:"#FF9F38",
         marginBottom: "5%"
@@ -130,6 +194,7 @@ const styles = StyleSheet.create({
         backgroundColor:"#FF3838",
     },
 
+    
     title: {
         marginLeft:"10%",
         fontWeight: "bold",
@@ -137,44 +202,44 @@ const styles = StyleSheet.create({
         marginTop: "5%",
         marginBottom:"2%"
     },
-
+    
     card: {
         marginHorizontal:"10%",
         padding: 10,
         borderWidth: 2,
         borderRadius: 2,
         borderColor: "#ffd731",
-        marginTop:"5%",
+        marginBottom:"5%",
         width: "80%",
         flexDirection: "row",
         justifyContent:"space-between",
     },
-
+    
     columnLeft: {
         justifyContent:"center"
     },
-
+    
     leftText: {
         fontSize: 18,
         fontWeight: "bold"
     },
-
+    
     columnRight: {
         alignItems: "center"
     },
-
+    
     proposals: {
         marginBottom: "4%",
         alignSelf:"center",
         fontSize: 18,
         fontWeight: "bold"
     },
-
+    
     proposalsContainer: {
         flexDirection: "row",
         justifyContent:"space-between",
     },
-
+    
     proposalsCards: {
         marginHorizontal:"2%",
         padding: 10,
@@ -184,5 +249,17 @@ const styles = StyleSheet.create({
     proposalsNumber: {
         fontSize: 26,
         fontWeight:"bold"
+    },
+
+    buttonDeleteDialog: {
+        alignSelf:"flex-end",
+        marginTop:10,
+        backgroundColor:"#FF3838",
+    },
+
+    inputDialog: {
+        backgroundColor:"ghostwhite",
+        marginBottom: 10
     }
+
 });

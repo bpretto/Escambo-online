@@ -3,8 +3,10 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import { Icon } from "react-native-elements"
 import { StyleSheet, View, Image } from "react-native";
 import { IconButton, TextInput } from "react-native-paper";
+import { createStackNavigator } from "@react-navigation/stack"; 
 
-import Homepage from "./Main/Homepage"
+import Home from "./Main/Homepage/Home"
+import SpecifiedItemList from "./Main/Homepage/SpecifiedItemList";
 import NewPost from "./Main/NewPost"
 import MyRequests from "./Main/MyRequests";
 import TradeRequestsForMe from "./Main/TradeRequestsForMe";
@@ -12,6 +14,7 @@ import TradeRequestsForMe from "./Main/TradeRequestsForMe";
 import Logo from "../images/logo.png"
 
 const Tab = createMaterialBottomTabNavigator();
+const { Navigator, Screen } = createStackNavigator();
 
 export default function MainScreen({ route, navigation }) {
 
@@ -86,6 +89,25 @@ export default function MainScreen({ route, navigation }) {
                 })}
             />
         </Tab.Navigator>
+    )
+}
+
+function Homepage() {
+    return (
+        <Navigator
+            initialRouteName="Home"
+            screenOptions={{headerShown: false}}
+        >
+            <Screen
+                name="Home"
+                component={Home}
+            />
+            
+            <Screen
+                name="SpecifiedItemList"
+                component={SpecifiedItemList}
+            />
+        </Navigator>
     )
 }
 

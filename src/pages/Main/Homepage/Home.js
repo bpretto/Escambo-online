@@ -4,7 +4,11 @@ import { ScrollView } from "react-native-gesture-handler";
 import { Card, IconButton, Paragraph, Searchbar, Title } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function Homepage({ route, navigation }) {
+export default function Home({ route, navigation }) {
+
+    function handleNavigateToSpecifiedItemList() {
+        navigation.navigate("SpecifiedItemList")
+    }
 
     return (
         <View style={styles.container}>
@@ -16,7 +20,7 @@ export default function Homepage({ route, navigation }) {
                         placeholderTextColor= 'gray'
                         iconColor="#ffd731"
                     />
-                    <Card style={styles.card} acessible={false}>
+                    <Card style={styles.card} acessible={true} onPress={(id) => handleNavigateToSpecifiedItemList(id)}>
                         <Card.Content>
                             <Card.Cover source={{ uri: 'https://vitasuco.com.br/wp-content/uploads/2020/08/capa_blog_vita_suco.png' }} />
                             <Title style={styles.cardTitle} >test</Title>

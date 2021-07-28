@@ -8,7 +8,8 @@ import Register from "./pages/Register/Register"
 import MapView from "./pages/Register/MapView"
 import Range from "./pages/Register/Range"
 import MainScreen from "./pages/MainScreen"
-import Profile from "./pages/Profile"
+import Profile from "./pages/Profile/Profile"
+import EditProfile from "./pages/Profile/EditProfile"
 
 const { Navigator, Screen } = createStackNavigator();
 
@@ -53,6 +54,11 @@ export default function Routes() {
                     <Screen
                         name="Profile"
                         component={Profile}
+                        options={({ navigation, route })=> ({})}
+                    />
+                    <Screen
+                        name="EditProfile"
+                        component={EditProfile}
                         options={({ navigation, route })=> ({})}
                     />
                 </Navigator>
