@@ -36,6 +36,27 @@ class Fire {
         });
     };
 
+    saveWithID = async (refName, dataForm) => {
+        return new Promise((res, rej) => {
+            firebase
+                .database()
+                .ref(refName) //passa a referencia entidade
+                .push(dataForm) // passa o objeto com os dados do formulário
+                .then((snapshot) => {
+                    console.log("Inserido! - " + snapshot.key);
+
+                    res(snapshot.key); // retorna o id salvo
+                    
+                    this.update(refName, dataForm, dataForm.id);
+                })
+                .catch((error) => {
+                    rej(error);
+                    console.log(error.code);
+                    console.log(error.message);
+                });
+        });
+    };
+
     //update do formulário
     update = (entidade, dataForm, keyRef) => {
         var updates = {};

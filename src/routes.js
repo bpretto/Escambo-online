@@ -7,7 +7,7 @@ import Login from "./pages/Login"
 import Register from "./pages/Register/Register"
 import MapView from "./pages/Register/MapView"
 import Range from "./pages/Register/Range"
-import MainScreen from "./pages/MainScreen"
+import MainScreen from "./pages/Main/MainScreen"
 import Profile from "./pages/Profile/Profile"
 import EditProfile from "./pages/Profile/EditProfile"
 
@@ -33,7 +33,7 @@ export default function Routes() {
         <PaperProvider theme={theme}>
             <NavigationContainer theme={theme}>
                 <Navigator
-                    initialRouteName="MainScreen"
+                    initialRouteName="Login"
                     screenOptions={{
                         headerTintColor: 'white',
                         headerTitleAlign: "center",

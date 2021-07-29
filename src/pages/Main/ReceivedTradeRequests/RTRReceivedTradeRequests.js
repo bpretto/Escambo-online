@@ -4,9 +4,13 @@ import { ScrollView } from "react-native-gesture-handler";
 import { Button, IconButton } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import trade from "../../images/logoredonda.png"
+import trade from "../../../images/logoredonda.png"
 
-export default function TradeRequestsForMe({ route, navigation }) {
+export default function ReceivedTradeRequests({ route, navigation }) {
+
+    function handleNavigateToSpecifiedItemList() {
+        navigation.navigate("RTRSpecifiedItemList")
+    }
 
     return (
         <View style={styles.container}>
@@ -22,6 +26,17 @@ export default function TradeRequestsForMe({ route, navigation }) {
                             <Text style={styles.leftDynamicText}>Relógio Couro</Text>
                             <Image source={trade} style={styles.trade} />
                             <Text style={styles.rightDynamicText}>Porco Vivo</Text>
+                        </View>
+                        <View style={styles.line}>
+                            <View/>
+                            <Button
+                                icon="eye"
+                                mode="contained"
+                                dark={true}
+                                onPress={handleNavigateToSpecifiedItemList}
+                            >
+                                Vizualizar
+                            </Button>
                         </View>
                     </View>
 
@@ -112,5 +127,13 @@ const styles = StyleSheet.create({
         marginTop: "2%",
         textAlign: "right",
         maxWidth: "20%"
+    },
+
+    buttonEdit: {
+        backgroundColor: "#FF9F38",
+    },
+
+    buttonCancel: {
+        backgroundColor: "#FF3838"
     },
 });

@@ -8,29 +8,14 @@ export default function NewPost({ route, navigation }) {
 
     const [confirmationVisible, setConfirmationVisible] = React.useState(false);
 
-    function handleCreateNewItem() {
-        try {
-            Fire.save("items", {
-                title,
-                description,
-                inTradeItems,
-                images,
-                location: {
-                    lat,
-                    lng
-                },
-            });
-        } catch (error) {
-            console.log(error.code, error.message);
-        }
-        firebase
+    function handleSentTradeOffer() {
+        //firebase
         setConfirmationVisible(true)
     }
 
     function handleHideConfirmation() {
         setConfirmationVisible(false)
     }
-
 
     return (
         <View style={styles.container}>
@@ -54,8 +39,14 @@ export default function NewPost({ route, navigation }) {
                         <IconButton icon="plus" color="#fff" size={40} style={styles.imageButton} />
                     </View>
                     <View style={styles.divider}>
-                        <Button icon="content-save" mode="contained" style={styles.button} dark={true} onPress={handleCreateNewItem}>
-                            Salvar
+                        <Button
+                            icon="send"
+                            mode="contained"
+                            style={styles.button}
+                            dark={true}
+                            onPress={handleSentTradeOffer}
+                        >
+                            Enviar proposta de troca
                         </Button>
                     </View>
                 </ScrollView>
@@ -63,7 +54,7 @@ export default function NewPost({ route, navigation }) {
 
             <Portal>
                 <Dialog visible={confirmationVisible} dismissable={true} onDismiss={handleHideConfirmation}>
-                    <Dialog.Title>Item cadastrado!</Dialog.Title>
+                    <Dialog.Title>Proposta enviada!</Dialog.Title>
                     <Dialog.Content>
                         <Button
                             icon="check"

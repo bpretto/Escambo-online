@@ -10,10 +10,31 @@ export default function Profile({ route, navigation }) {
             title: "Perfil",
         });
     }, [navigation]);
-    
+
     const [deleteVisible, setDeleteVisible] = React.useState(false);
     const [buttonDisabled, setButtonDisabled] = React.useState(true);
     const [inputValue, setInputValue] = React.useState("");
+    const user = firebase.auth().currentUser
+    console.log(user.uid)
+    let username, name, email, tel, range, lat, lng
+
+    var ref = firebase.database().ref("users");
+      
+    ref.on("value", function (snapshot) {
+    snapshot.forEach((users) => {
+        if (user.email == users.val().email) {
+            username = users.val().username;
+            name = users.val().name;
+            email = users.val().email
+            tel = users.val().tel;
+            range = users.val().range;
+            lat = users.val().location.lat;
+            lng = users.val().location.lng;
+        }
+    })
+    }, function (error) {
+    console.log("Error: " + error.code);
+    });
 
     function handleLogOut() {
         navigation.navigate("Login")
@@ -21,7 +42,15 @@ export default function Profile({ route, navigation }) {
     }
 
     function handleNavigateToEditProfile() {
-        navigation.navigate("EditProfile")
+        navigation.navigate("EditProfile", {
+            username,
+            name,
+            email,
+            tel,
+            range,
+            lat,
+            lng
+        })
     }
 
     function handleShowDialogDeleteAccount() {
@@ -40,7 +69,6 @@ export default function Profile({ route, navigation }) {
 
     function handleDeleteAccount() {
         setDeleteVisible(false)
-        const user = firebase.auth().currentUser;
         user.delete().then(() => {
             setDeleteVisible(false)
             navigation.navigate("Login")
@@ -55,16 +83,16 @@ export default function Profile({ route, navigation }) {
             <View style={styles.userCard}>
                 <View>
                     <Text style={styles.labelText}>Username</Text>
-                    <Text style={styles.text}>bpretto</Text>   
+                    <Text style={styles.text}>{username}</Text>   
 
                     <Text style={styles.labelText}>Nome</Text>
-                    <Text style={styles.text}>Bernardo Pretto</Text>
+                    <Text style={styles.text}>{name}</Text>
                     
                     <Text style={styles.labelText}>Whatsapp</Text>
-                    <Text style={styles.text}>(49)99936-6685</Text>
+                    <Text style={styles.text}>{tel}</Text>
 
                     <Text style={styles.labelText}>Raio do radar de escambo</Text>
-                    <Text style={styles.text}>200km</Text>
+                    <Text style={styles.text}>{range}km</Text>
                 </View>
 
                 <View>

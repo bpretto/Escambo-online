@@ -22,6 +22,19 @@ export default function Range({ route, navigation }) {
                 .then(() => {
                     var user = firebase.auth().currentUser;
 
+                    Fire.update("users", {
+                        id: user.uid,
+                        username,
+                        name,
+                        email,
+                        tel,
+                        range,
+                        location: {
+                            lat,
+                            lng
+                        },
+                    });
+
                     user.sendEmailVerification().then(function () {
                         Alert.alert("Verificação", "Por favor, clique no link que enviamos para seu e-mail para autenticar sua conta!")
                         navigation.navigate("Login")
@@ -30,16 +43,7 @@ export default function Range({ route, navigation }) {
                     })
                 });
 
-            Fire.save("users", {
-                username,
-                name,
-                email,
-                tel,
-                location: {
-                    lat,
-                    lng
-                },
-            });
+            
         } catch (error) {
             console.log(error.code, error.message);
         }

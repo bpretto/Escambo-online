@@ -4,16 +4,20 @@ import { ScrollView } from "react-native-gesture-handler";
 import { Button, IconButton } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import trade from "../../images/logoredonda.png"
+import trade from "../../../images/logoredonda.png"
 
-export default function MyRequests({ route, navigation }) {
+export default function SentTradeRequests({ route, navigation }) {
+
+    function handleNavigateToSelectItemToTrade() {
+        navigation.navigate("STRSelectItemToTrade")
+    }
 
     return (
         <View style={styles.container}>
             <SafeAreaView style={styles.safeAreaView}>
                 <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }} style={styles.scrollView} showsVerticalScrollIndicator={false}>
                     <Text style={styles.pageTitle}>Meus pedidos de troca</Text>
-                    <View style={styles.card}>
+                    <View style={styles.card} onClick={() => console.log("pressed")}>
                         <View style={styles.line}>
                             <Text style={styles.leftText}>Você recebe:</Text>
                             <Text style={styles.rightText}>Pelo seu:</Text>
@@ -22,6 +26,26 @@ export default function MyRequests({ route, navigation }) {
                             <Text style={styles.leftDynamicText}>Porco Vivo</Text>
                             <Image source={trade} style={styles.trade} />
                             <Text style={styles.rightDynamicText}>Relógio Couro</Text>
+                        </View>
+                        <View style={styles.line}>
+                            <Button
+                                icon="pencil"
+                                mode="contained"
+                                style={styles.buttonEdit}
+                                dark={true}
+                                // onPress={handleNavigateToSelectItemToTrade}
+                            >
+                                Editar
+                            </Button>
+                            <Button
+                                icon="delete-empty"
+                                mode="contained"
+                                style={styles.buttonCancel}
+                                dark={true}
+                                // onPress={handleNavigateToSelectItemToTrade}
+                            >
+                                Apagar
+                            </Button>
                         </View>
                     </View>
 
@@ -34,6 +58,26 @@ export default function MyRequests({ route, navigation }) {
                             <Text style={styles.leftDynamicText}>Porco Vivo</Text>
                             <Image source={trade} style={styles.trade} />
                             <Text style={styles.rightDynamicText}>Relógio Couro</Text>
+                        </View>
+                        <View style={styles.line}>
+                            <Button
+                                icon="pencil"
+                                mode="contained"
+                                style={styles.buttonEdit}
+                                dark={true}
+                                onPress={handleNavigateToSelectItemToTrade}
+                            >
+                                Editar
+                            </Button>
+                            <Button
+                                icon="delete-empty"
+                                mode="contained"
+                                style={styles.buttonCancel}
+                                dark={true}
+                                // onPress={handleNavigateToSelectItemToTrade}
+                            >
+                                Apagar
+                            </Button>
                         </View>
                     </View>
                 </ScrollView>
@@ -112,5 +156,13 @@ const styles = StyleSheet.create({
         marginTop: "2%",
         textAlign: "right",
         maxWidth: "20%"
+    },
+
+    buttonEdit: {
+        backgroundColor: "#FF9F38",
+    },
+
+    buttonCancel: {
+        backgroundColor: "#FF3838"
     },
 });

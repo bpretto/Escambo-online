@@ -1,15 +1,29 @@
 import React from "react";
 import { StyleSheet, View, TextInput, Text, Image } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import { Button, Card, IconButton, Paragraph, Searchbar, Title } from "react-native-paper";
+import { Button, Card, Dialog, IconButton, Paragraph, Portal, Searchbar, Title } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function SpecifiedItemList({ route, navigation }) {
+export default function RTRSpecifiedItemList({ route, navigation }) {
 
-    // const { id } = route.params; 
+    // const { id } = route.params;
+    const [cancelVisible, setCancelVisible] = React.useState(false);
 
-    function handleNavigateToSelectItemToTrade() {
-        navigation.navigate("SelectItemToTrade")
+    function handleShowContact() {
+
+    }
+
+    function handleRefuse() {
+        setCancelVisible(true)
+    }
+
+    function handleCancel() {
+        setCancelVisible(false)
+        //firebase
+    }
+
+    function handleHideCancel() {
+        setCancelVisible(false)
     }
 
     return (
@@ -25,12 +39,19 @@ export default function SpecifiedItemList({ route, navigation }) {
                         </View>
                         <View style={styles.column}>
                             <Button
-                                icon="swap-horizontal-bold"
+                                icon="phone"
                                 mode="contained"
-                                style={styles.buttonEdit}
                                 dark={true}
-                                onPress={handleNavigateToSelectItemToTrade}>
-                                Vamos trocar!
+                                onPress={handleShowContact}>
+                                Contatar
+                            </Button>
+                            <Button
+                                icon="cancel"
+                                mode="contained"
+                                style={styles.buttonRefuse}
+                                dark={true}
+                                onPress={handleRefuse}>
+                                Recusar
                             </Button>
                         </View>
                     </View>
@@ -74,6 +95,34 @@ export default function SpecifiedItemList({ route, navigation }) {
                     </View>
                 </ScrollView>
             </SafeAreaView>
+
+            <Portal>
+                <Dialog visible={cancelVisible} dismissable={true} onDismiss={handleHideCancel}>
+                    <Dialog.Title>Você tem certeza?</Dialog.Title>
+                    <Dialog.Content>
+                        <Text style={styles.dialogText}>
+                            Deseja mesmo recusar a proposta?
+                        </Text>
+                        <Button
+                            icon="check"
+                            mode="contained"
+                            dark={true}
+                            onPress={handleCancel}
+                        >
+                            Sim
+                        </Button>
+                        <Button
+                            icon="cancel"
+                            mode="contained"
+                            dark={true}
+                            onPress={handleHideCancel}
+                            style={styles.buttonRefuse}
+                        >
+                            Não
+                        </Button>
+                    </Dialog.Content>
+                </Dialog>
+            </Portal>
         </View>
     )
 }
@@ -108,6 +157,7 @@ const styles = StyleSheet.create({
     },
 
     title: {
+        marginTop: 15,
         fontWeight: "bold",
         fontSize: 19,
     },
@@ -134,6 +184,16 @@ const styles = StyleSheet.create({
     fieldTitle: {
         fontWeight:"bold",
         fontSize:15
+    },
+
+    dialogText: {
+        marginBottom: 30,
+        fontSize: 15
+    },
+
+    buttonRefuse: {
+        backgroundColor: "#FF3838",
+        marginTop: 5
     },
 
 });

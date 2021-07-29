@@ -19,8 +19,8 @@ export default function login({ route, navigation }) {
                 var ref = firebase.database().ref("users");
       
                 ref.on("value", function (snapshot) {
-                snapshot.forEach((usuarios) => {
-                    if (username == usuarios.val().username) {
+                snapshot.forEach((users) => {
+                    if (username == users.val().username) {
                         usernameFromDB = true;
                     }
                 })

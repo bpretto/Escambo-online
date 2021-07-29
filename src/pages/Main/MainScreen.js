@@ -5,13 +5,17 @@ import { StyleSheet, View, Image } from "react-native";
 import { IconButton, TextInput } from "react-native-paper";
 import { createStackNavigator } from "@react-navigation/stack"; 
 
-import Home from "./Main/Homepage/Home"
-import SpecifiedItemList from "./Main/Homepage/SpecifiedItemList";
-import NewPost from "./Main/NewPost"
-import MyRequests from "./Main/MyRequests";
-import TradeRequestsForMe from "./Main/TradeRequestsForMe";
+import Home from "./Homepage/Home"
+import SpecifiedItemList from "./Homepage/SpecifiedItemList";
+import SelectItemToTrade from "./Homepage/SelectItemToTrade";
+import CreateNewItem from "./Homepage/CreateNewItem";
+import NewPost from "./NewPost"
+import STRSentTradeRequests from "./SentTradeRequests/STRSentTradeRequests";
+import STRSelectItemToTrade from "./SentTradeRequests/STRSelectItemToTrade";
+import RTRReceivedTradeRequests from "./ReceivedTradeRequests/RTRReceivedTradeRequests";
+import RTRSpecifiedItemList from "./ReceivedTradeRequests/RTRSpecifiedItemList";
 
-import Logo from "../images/logo.png"
+import Logo from "../../images/logo.png"
 
 const Tab = createMaterialBottomTabNavigator();
 const { Navigator, Screen } = createStackNavigator();
@@ -68,8 +72,8 @@ export default function MainScreen({ route, navigation }) {
             />
 
             <Tab.Screen
-                name="MyRequests"
-                component={MyRequests}
+                name="STR"
+                component={STR}
                 options={({ navigation, route })=> ({
                     tabBarLabel: "Pedidos realizados",
                     tabBarIcon: ({color}) => (
@@ -79,8 +83,8 @@ export default function MainScreen({ route, navigation }) {
             />
 
             <Tab.Screen
-                name="TradeRequestsForMe"
-                component={TradeRequestsForMe}
+                name="RTR"
+                component={RTR}
                 options={({ navigation, route })=> ({
                     tabBarLabel: "Pedidos recebidos",
                     tabBarIcon: ({color}) => (
@@ -102,12 +106,55 @@ function Homepage() {
                 name="Home"
                 component={Home}
             />
-            
             <Screen
                 name="SpecifiedItemList"
                 component={SpecifiedItemList}
             />
+            <Screen
+                name="SelectItemToTrade"
+                component={SelectItemToTrade}
+            />
+            <Screen
+                name="CreateNewItem"
+                component={CreateNewItem}
+            />
         </Navigator>
+    )
+}
+
+function STR() {
+    return(
+        <Navigator
+        initialRouteName="STRSentTradeRequests"
+        screenOptions={{headerShown: false}}
+        >
+            <Screen
+                name="STRSentTradeRequests"
+                component={STRSentTradeRequests}
+            />
+            <Screen
+                name="STRSelectItemToTrade"
+                component={STRSelectItemToTrade}
+            />
+        </Navigator>    
+    )
+}
+
+function RTR() {
+    return(
+        <Navigator
+        initialRouteName="RTRReceivedTradeRequests"
+        screenOptions={{headerShown: false}}
+        >
+            <Screen
+                name="RTRReceivedTradeRequests"
+                component={RTRReceivedTradeRequests}
+            />
+            <Screen
+                name="RTRSpecifiedItemList"
+                component={RTRSpecifiedItemList}
+            />
+        </Navigator>    
     )
 }
 
