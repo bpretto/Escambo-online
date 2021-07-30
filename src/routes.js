@@ -10,6 +10,8 @@ import Range from "./pages/Register/Range"
 import MainScreen from "./pages/Main/MainScreen"
 import Profile from "./pages/Profile/Profile"
 import EditProfile from "./pages/Profile/EditProfile"
+import OwnItemList from "./pages/Profile/OwnItemList"
+import EditOwnItem from "./pages/Profile/EditOwnItem"
 
 const { Navigator, Screen } = createStackNavigator();
 
@@ -59,6 +61,16 @@ export default function Routes() {
                     <Screen
                         name="EditProfile"
                         component={EditProfile}
+                        options={({ navigation, route })=> ({})}
+                    />
+                    <Screen
+                        name="OwnItemList"
+                        component={OwnItemList}
+                        options={({ navigation, route })=> ({})}
+                    />
+                    <Screen
+                        name="EditOwnItem"
+                        component={EditOwnItem}
                         options={({ navigation, route })=> ({})}
                     />
                 </Navigator>

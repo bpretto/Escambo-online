@@ -4,9 +4,9 @@ import { ScrollView } from "react-native-gesture-handler";
 import { Button, Dialog, IconButton, Portal } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from 'expo-image-picker';
-import ImageList from '../../../components/ImageList';
+import ImageList from '../../components/ImageList';
 import firebase from "firebase";
-import Fire from "../../../components/Fire";
+import Fire from "../../components/Fire";
 
 
 export default function NewPost({ route, navigation }) {
@@ -44,11 +44,7 @@ export default function NewPost({ route, navigation }) {
             if(!image.cancelled) {
                 console.log(image)
                 imageState = image.uri
-                // setImageState(image.uri)
                 setImages(images.concat(imageState))
-                // images.push(imageState)
-                // images.push(image)
-                // console.log(images)
             }
         }
     }
@@ -58,6 +54,8 @@ export default function NewPost({ route, navigation }) {
             setError(true)
         } else {
             try {
+                let imageNames = []
+
                 images.map(async (image) => {
                     console.log(image)
                     var randomString = '';
@@ -65,9 +63,9 @@ export default function NewPost({ route, navigation }) {
                     for (var i = 0; i < 15; i++) {
                         randomString += possibleLetters.charAt(Math.floor(Math.random() * possibleLetters.length));
                     }
-                    
                     var storageRef = firebase.storage().ref();
                     var imageRef = storageRef.child("images/" + randomString)
+                    imageNames.push(randomString)
                     
                     const file = await new Promise((resolve, reject) => {
                         const xhr = new XMLHttpRequest();
@@ -121,11 +119,13 @@ export default function NewPost({ route, navigation }) {
                 })
 
                 Fire.save("items", {
-                    user_id: user.uid,                   
+                    user_id: user.uid, 
+                    sent: 0,
+                    received: 0,                  
                     title,
                     description,
                     inTradeItems,
-                    images,
+                    imageNames,                    
                     location
                 });
                 setConfirmationVisible(true)

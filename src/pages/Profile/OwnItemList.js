@@ -3,27 +3,30 @@ import { StyleSheet, View, TextInput, Text, Image } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { Button, Card, Dialog, IconButton, Paragraph, Portal, Searchbar, Title } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Fire from "../../components/Fire";
 
-export default function RTRSpecifiedItemList({ route, navigation }) {
+export default function OwnItemList({ route, navigation }) {
 
-    // const { id } = route.params;
-    const [cancelVisible, setCancelVisible] = React.useState(false);
+    const { item } = route.params;
+    console.log(item)
+    const [deleteVisible, setDeleteVisible] = React.useState(false);
 
-    function handleShowContact() {
-
+    function handleNavigateToEditOwnItem() {
+        navigation.navigate("EditOwnItem", { item })
     }
 
-    function handleRefuse() {
-        setCancelVisible(true)
+    function handleDelete() {
+        setDeleteVisible(true)
     }
 
     function handleConfirm() {
-        setCancelVisible(false)
-        //firebase
+        setDeleteVisible(false)
+        Fire.remove("items", item.id)
+        navigation.navigate("MainScreen")
     }
 
-    function handleHideCancel() {
-        setCancelVisible(false)
+    function handleHideDelete() {
+        setDeleteVisible(false)
     }
 
     return (
@@ -34,24 +37,24 @@ export default function RTRSpecifiedItemList({ route, navigation }) {
 
                     <View style={styles.head}>
                         <View style={styles.column}>
-                            <Text style={styles.title}>Iphone 6 32gb</Text>
-                            <Text>Vitoria Carolina</Text>
+                            <Text style={styles.title}>{item.title}</Text>
+                            <Text>Você cadastrou esse item!</Text>
                         </View>
                         <View style={styles.column}>
                             <Button
-                                icon="phone"
+                                icon="pencil"
                                 mode="contained"
                                 dark={true}
-                                onPress={handleShowContact}>
-                                Contatar
+                                onPress={handleNavigateToEditOwnItem}>
+                                Editar
                             </Button>
                             <Button
-                                icon="cancel"
+                                icon="delete-empty"
                                 mode="contained"
-                                style={styles.buttonRefuse}
+                                style={styles.buttonDelete}
                                 dark={true}
-                                onPress={handleRefuse}>
-                                Recusar
+                                onPress={handleDelete}>
+                                Excluir
                             </Button>
                         </View>
                     </View>
@@ -64,6 +67,9 @@ export default function RTRSpecifiedItemList({ route, navigation }) {
                             showsHorizontalScrollIndicator={false}
                             contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
                         >
+                            {/* {item.image.map((item) => (
+                                
+                            ))} */}
                             <Image 
                                 style={styles.image}
                                 source={{
@@ -86,22 +92,22 @@ export default function RTRSpecifiedItemList({ route, navigation }) {
             
                     <View style={styles.divider}>
                         <Text style={styles.fieldTitle}>Descrição</Text>
-                        <Text style={styles.fieldText}>vickxxxx</Text>
+                        <Text style={styles.fieldText}>{item.description}</Text>
                         
                     </View>
                     <View style={styles.divider}>
                         <Text style={styles.fieldTitle}>O que quero em troca?</Text>
-                        <Text style={styles.fieldText}>vickxxxx</Text>
+                        <Text style={styles.fieldText}>{item.inTradeItems}</Text>
                     </View>
                 </ScrollView>
             </SafeAreaView>
 
             <Portal>
-                <Dialog visible={cancelVisible} dismissable={true} onDismiss={handleHideCancel}>
+                <Dialog visible={deleteVisible} dismissable={true} onDismiss={handleHideDelete}>
                     <Dialog.Title>Você tem certeza?</Dialog.Title>
                     <Dialog.Content>
                         <Text style={styles.dialogText}>
-                            Deseja mesmo recusar a proposta?
+                            Deseja mesmo excluir o item?
                         </Text>
                         <Button
                             icon="check"
@@ -115,8 +121,8 @@ export default function RTRSpecifiedItemList({ route, navigation }) {
                             icon="cancel"
                             mode="contained"
                             dark={true}
-                            onPress={handleHideCancel}
-                            style={styles.buttonRefuse}
+                            onPress={handleHideDelete}
+                            style={styles.buttonDelete}
                         >
                             Não
                         </Button>
@@ -191,7 +197,7 @@ const styles = StyleSheet.create({
         fontSize: 15
     },
 
-    buttonRefuse: {
+    buttonDelete: {
         backgroundColor: "#FF3838",
         marginTop: 5
     },

@@ -1,7 +1,8 @@
 import React from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { Button, Dialog, Portal, TextInput } from "react-native-paper";
 import firebase from "firebase";
+import Fire from "../../components/Fire";
 
 export default function Profile({ route, navigation }) {
     
@@ -11,12 +12,14 @@ export default function Profile({ route, navigation }) {
         });
     }, [navigation]);
 
+    
     const [deleteVisible, setDeleteVisible] = React.useState(false);
     const [buttonDisabled, setButtonDisabled] = React.useState(true);
     const [inputValue, setInputValue] = React.useState("");
     const user = firebase.auth().currentUser
-    console.log(user.uid)
+    console.log(user)
     let username, name, email, tel, range, lat, lng
+    let itemArray = [];
 
     var ref = firebase.database().ref("users");
       
@@ -30,6 +33,29 @@ export default function Profile({ route, navigation }) {
             range = users.val().range;
             lat = users.val().location.lat;
             lng = users.val().location.lng;
+        }
+    })
+    }, function (error) {
+    console.log("Error: " + error.code);
+    });
+
+    ref = firebase.database().ref("items");
+      
+    ref.on("value", function (snapshot) {
+    snapshot.forEach((item) => {
+        if (user.uid == item.val().user_id) {
+            let card = {
+                id: item.val().id,
+                title: item.val().title,
+                description: item.val().description,
+                images: item.val().images,
+                inTradeItems: item.val().inTradeItems,
+                sent: item.val().sent,
+                received: item.val().received,
+                username: item.val().username
+            };
+
+            itemArray.push(card)
         }
     })
     }, function (error) {
@@ -50,6 +76,15 @@ export default function Profile({ route, navigation }) {
             range,
             lat,
             lng
+        })
+    }
+
+    function handleNavigateToOwnItemList(id) {
+        itemArray.map((item) => {
+            if (item.id == id) {
+                console.log(item)
+                navigation.navigate("OwnItemList", { item })
+            }
         })
     }
 
@@ -112,43 +147,26 @@ export default function Profile({ route, navigation }) {
 
             <Text style={styles.title}>Meus itens</Text>
 
-            <View style={styles.card}>
-                <View style={styles.columnLeft}>
-                    <Text style={styles.leftText}>Relógio Couro</Text>
-                </View>
-                <View style={styles.columnRight}>
-                    <Text style={styles.proposals}>Propostas</Text>
-                    <View style={styles.proposalsContainer}>
-                        <View style={styles.proposalsCards}>
-                            <Text style={styles.proposalsNumber}>4</Text>
-                            <Text style={styles.proposalsText}>Enviadas</Text>
-                        </View>
-                        <View style={styles.proposalsCards}>
-                            <Text style={styles.proposalsNumber}>45</Text>
-                            <Text style={styles.proposalsText}>Recebidas</Text>
-                        </View>
-                    </View>                    
-                </View>
-            </View>
-
-            <View style={styles.card}>
-                <View style={styles.columnLeft}>
-                    <Text style={styles.leftText}>Relógio Couro</Text>
-                </View>
-                <View style={styles.columnRight}>
-                    <Text style={styles.proposals}>Propostas</Text>
-                    <View style={styles.proposalsContainer}>
-                        <View style={styles.proposalsCards}>
-                            <Text style={styles.proposalsNumber}>4</Text>
-                            <Text style={styles.proposalsText}>Enviadas</Text>
-                        </View>
-                        <View style={styles.proposalsCards}>
-                            <Text style={styles.proposalsNumber}>45</Text>
-                            <Text style={styles.proposalsText}>Recebidas</Text>
-                        </View>
-                    </View>                    
-                </View>
-            </View>
+            {itemArray.map((item) => (
+                    <TouchableOpacity style={styles.card} onPress={() => handleNavigateToOwnItemList(item.id)}>
+                    <View style={styles.columnLeft}>
+                        <Text style={styles.leftText}>{item.title}</Text>
+                    </View>
+                    <View style={styles.columnRight}>
+                        <Text style={styles.proposals}>Propostas</Text>
+                        <View style={styles.proposalsContainer}>
+                            <View style={styles.proposalsCards}>
+                                <Text style={styles.proposalsNumber}>{item.sent}</Text>
+                                <Text style={styles.proposalsText}>Enviadas</Text>
+                            </View>
+                            <View style={styles.proposalsCards}>
+                                <Text style={styles.proposalsNumber}>{item.received}</Text>
+                                <Text style={styles.proposalsText}>Recebidas</Text>
+                            </View>
+                        </View>                    
+                    </View>
+                </TouchableOpacity>
+            ))}
 
             <Portal>
                 <Dialog visible={deleteVisible} dismissable={true} onDismiss={()=>setDeleteVisible(false)}>

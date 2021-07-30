@@ -9,7 +9,7 @@ import Home from "./Homepage/Home"
 import SpecifiedItemList from "./Homepage/SpecifiedItemList";
 import SelectItemToTrade from "./Homepage/SelectItemToTrade";
 import CreateNewItem from "./Homepage/CreateNewItem";
-import NewPost from "./NewPost/NewPost"
+import NewPost from "./NewPost"
 import STRSentTradeRequests from "./SentTradeRequests/STRSentTradeRequests";
 import STRSelectItemToTrade from "./SentTradeRequests/STRSelectItemToTrade";
 import RTRReceivedTradeRequests from "./ReceivedTradeRequests/RTRReceivedTradeRequests";
