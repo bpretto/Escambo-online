@@ -17,7 +17,6 @@ export default function Profile({ route, navigation }) {
     const [buttonDisabled, setButtonDisabled] = React.useState(true);
     const [inputValue, setInputValue] = React.useState("");
     const user = firebase.auth().currentUser
-    console.log(user)
     let username, name, email, tel, range, lat, lng
     let itemArray = [];
 
@@ -44,17 +43,20 @@ export default function Profile({ route, navigation }) {
     ref.on("value", function (snapshot) {
     snapshot.forEach((item) => {
         if (user.uid == item.val().user_id) {
+            let images = []
+            item.val().imageNames.map((image) => {
+                images.push(image)
+            })
             let card = {
                 id: item.val().id,
                 title: item.val().title,
                 description: item.val().description,
-                images: item.val().images,
+                imageNames: images,
                 inTradeItems: item.val().inTradeItems,
                 sent: item.val().sent,
                 received: item.val().received,
                 username: item.val().username
             };
-
             itemArray.push(card)
         }
     })
@@ -82,7 +84,6 @@ export default function Profile({ route, navigation }) {
     function handleNavigateToOwnItemList(id) {
         itemArray.map((item) => {
             if (item.id == id) {
-                console.log(item)
                 navigation.navigate("OwnItemList", { item })
             }
         })
@@ -93,8 +94,6 @@ export default function Profile({ route, navigation }) {
     }
 
     function disabledButton(inputValue) {
-        console.log(inputValue)
-
         if (inputValue == "excluir perfil") {
             setButtonDisabled(false)
         } else {

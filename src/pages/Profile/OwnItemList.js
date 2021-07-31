@@ -1,15 +1,40 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, View, TextInput, Text, Image } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { Button, Card, Dialog, IconButton, Paragraph, Portal, Searchbar, Title } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Fire from "../../components/Fire";
+import firebase from "firebase"
 
 export default function OwnItemList({ route, navigation }) {
 
     const { item } = route.params;
-    console.log(item)
+    const [refreshPage, setRefreshPage] = React.useState(0);
     const [deleteVisible, setDeleteVisible] = React.useState(false);
+    const [images, setImages] = React.useState([]);
+
+    useEffect(() => {
+        imageStorage()
+    },[])
+    async function imageStorage() {
+        try {
+            console.log(item.imageNames)
+            // let image = item.imageNames[0]
+            // let imageFromDB = await firebase.storage().ref("images").child(image).getDownloadURL();
+            //     setImages(images.concat(imageFromDB))
+            //     console.log(imageFromDB)
+            console.log("chorane",item.imageNames)
+            item.imageNames.map(async (imageName) => {
+                console.log("this."+imageName)
+            })
+            item.imageNames.map(async (imageName) => {
+                const image = await firebase.storage().ref("images").child(imageName).getDownloadURL();
+                setImages(images.concat(image))
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     function handleNavigateToEditOwnItem() {
         navigation.navigate("EditOwnItem", { item })
@@ -67,21 +92,21 @@ export default function OwnItemList({ route, navigation }) {
                             showsHorizontalScrollIndicator={false}
                             contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
                         >
-                            {/* {item.image.map((item) => (
+                            {images.map((lepo) => (
+                                <Image 
+                                    style={styles.image}
+                                    source={{
+                                        uri: lepo,
+                                        cache: "default",
+                                        width:300
+                                    }}
+                                /> 
+                            ))}
                                 
-                            ))} */}
                             <Image 
                                 style={styles.image}
                                 source={{
-                                    uri: "https://vitasuco.com.br/wp-content/uploads/2020/08/capa_blog_vita_suco.png",
-                                    cache: "default",
-                                    width:300
-                                }}
-                            />
-                            <Image 
-                                style={styles.image}
-                                source={{
-                                    uri: "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/runningfeet-1446281102.jpg",
+                                    uri: images[0],
                                     cache: "default",
                                     width:300
                                 }}

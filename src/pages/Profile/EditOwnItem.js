@@ -14,7 +14,7 @@ export default function EditOwnItem({ route, navigation }) {
     const { item } = route.params;
     console.log(item)
 
-    const [refreshPage, setRefreshPage] = useState(0);
+    const [refreshPage, setRefreshPage] = React.useState(0);
     const [confirmationVisible, setConfirmationVisible] = React.useState(false);
     const [error, setError] = React.useState(false);
     const [maxImages, setMaxImages] = React.useState(false);
@@ -22,10 +22,10 @@ export default function EditOwnItem({ route, navigation }) {
     const [description, setDescription] = React.useState(item.description);
     const [inTradeItems, setInTradeItems] = React.useState(item.inTradeItems);
     const [images, setImages] = React.useState([]);
-    const [upLoading, setUpLoading] = useState(null);
+    const [upLoading, setUpLoading] = React.useState(null);
     let imageState;
 
-    useEffect(() => {}, [refreshPage]);
+    useEffect(() => {}, [images]);
 
     function handleRemoveImage(image) {
         console.log(images)
