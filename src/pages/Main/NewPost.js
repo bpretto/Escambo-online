@@ -83,7 +83,7 @@ export default function NewPost({ route, navigation }) {
                     });
                     
                     var metadata = {
-                        contentType: 'image/jpeg'
+                        contentType: 'image/jpg'
                     };
                     
                     console.log(metadata, randomString)

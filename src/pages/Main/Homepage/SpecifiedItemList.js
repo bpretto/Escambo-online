@@ -1,15 +1,63 @@
-import React from "react";
-import { StyleSheet, View, TextInput, Text, Image } from "react-native";
+import React, { useEffect } from "react";
+import { StyleSheet, View, TextInput, Text, Image, TouchableOpacity } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import { Button, Card, IconButton, Paragraph, Searchbar, Title } from "react-native-paper";
+import { Button, Card, Dialog, IconButton, Paragraph, Portal, Searchbar, Title } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Fire from "../../../components/Fire";
+import firebase from "firebase"
 
-export default function SpecifiedItemList({ route, navigation }) {
 
-    // const { id } = route.params; 
+export default function OwnItemList({ route, navigation }) {
 
+    const { item } = route.params;
+    const [refreshPage, setRefreshPage] = React.useState(0);
+    const [deleteVisible, setDeleteVisible] = React.useState(false);
+    const [images, setImages] = React.useState([]);
+    const [name, setName] = React.useState([]);
+    
+
+    useEffect(() => {
+        imageStorage()
+        getName()
+    }, [])
+    async function imageStorage() {    
+        try {
+            item.imageNames.map(async (imageName) => {
+                const image = await firebase.storage().ref("images").child(imageName).getDownloadURL();
+                setImages((oldArray) => [...oldArray, image])
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async function getName() {
+        var ref = firebase.database().ref("users");      
+        ref.on("value", function (snapshot) {
+            snapshot.forEach((user) => {
+                if (user.val().id == item.user_id) {
+                    setName(user.val().name)
+                } 
+            })
+        })
+    }
+    
     function handleNavigateToSelectItemToTrade() {
-        navigation.navigate("SelectItemToTrade")
+        navigation.navigate("SelectItemToTrade", { item })
+    }
+
+    function handleDelete() {
+        setDeleteVisible(true)
+    }
+
+    function handleConfirm() {
+        setDeleteVisible(false)
+        Fire.remove("items", item.id)
+        navigation.navigate("MainScreen")
+    }
+
+    function handleHideDelete() {
+        setDeleteVisible(false)
     }
 
     return (
@@ -20,14 +68,13 @@ export default function SpecifiedItemList({ route, navigation }) {
 
                     <View style={styles.head}>
                         <View style={styles.column}>
-                            <Text style={styles.title}>Iphone 6 32gb</Text>
-                            <Text>Vitoria Carolina</Text>
+                            <Text style={styles.title}>{item.title}</Text>
+                            <Text>{name}</Text>
                         </View>
                         <View style={styles.column}>
                             <Button
                                 icon="swap-horizontal-bold"
                                 mode="contained"
-                                style={styles.buttonEdit}
                                 dark={true}
                                 onPress={handleNavigateToSelectItemToTrade}>
                                 Vamos trocar!
@@ -43,34 +90,41 @@ export default function SpecifiedItemList({ route, navigation }) {
                             showsHorizontalScrollIndicator={false}
                             contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
                         >
-                            <Image 
-                                style={styles.image}
-                                source={{
-                                    uri: "https://vitasuco.com.br/wp-content/uploads/2020/08/capa_blog_vita_suco.png",
-                                    cache: "default",
-                                    width:300
-                                }}
-                            />
-                            <Image 
-                                style={styles.image}
-                                source={{
-                                    uri: "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/runningfeet-1446281102.jpg",
-                                    cache: "default",
-                                    width:300
-                                }}
-                            />
+                            {images.length > 2 
+                                ? images.map((image) => (
+                                    <View>
+                                        <Image 
+                                        style={styles.image}
+                                        source={{
+                                            uri: image,
+                                            cache: "default",
+                                            width: 300, height: 300
+                                        }}
+                                        />
+                                    </View>
+                                ))
+                                :   <View>
+                                        <Image
+                                        source={{
+                                            uri: images[0],
+                                            cache: "default",
+                                            width: 300, height: 300
+                                        }}
+                                        />
+                                    </View>
+                            }
                         </ScrollView>
                     </SafeAreaView>
 
             
                     <View style={styles.divider}>
                         <Text style={styles.fieldTitle}>Descrição</Text>
-                        <Text style={styles.fieldText}>vickxxxx</Text>
-                        
+                        <Text style={styles.fieldText}>{item.description}</Text>                        
                     </View>
+                    
                     <View style={styles.divider}>
                         <Text style={styles.fieldTitle}>O que quero em troca?</Text>
-                        <Text style={styles.fieldText}>vickxxxx</Text>
+                        <Text style={styles.fieldText}>{item.inTradeItems}</Text>
                     </View>
                 </ScrollView>
             </SafeAreaView>
@@ -84,6 +138,10 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'flex-start',
+    },
+
+    imageContainer: {
+        marginLeft: 10    
     },
 
     safeAreaView: {
@@ -108,6 +166,7 @@ const styles = StyleSheet.create({
     },
 
     title: {
+        marginTop: 15,
         fontWeight: "bold",
         fontSize: 19,
     },
@@ -123,7 +182,7 @@ const styles = StyleSheet.create({
     },
 
     image: {
-        marginRight: 20
+        marginRight: 20,
     },
 
     divider: {
@@ -134,6 +193,16 @@ const styles = StyleSheet.create({
     fieldTitle: {
         fontWeight:"bold",
         fontSize:15
+    },
+
+    dialogText: {
+        marginBottom: 30,
+        fontSize: 15
+    },
+
+    buttonDelete: {
+        backgroundColor: "#FF3838",
+        marginTop: 5
     },
 
 });

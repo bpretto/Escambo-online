@@ -1,13 +1,59 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, View, TextInput, Text } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { Card, IconButton, Paragraph, Searchbar, Title } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import firebase from "firebase"
 
 export default function Home({ route, navigation }) {
+    
+    const [refreshPage, setRefreshPage] = React.useState(0);
+    const [itemArray, setItemArray] = React.useState([]);
+    const user = firebase.auth().currentUser
+    let userRange, userLat, userLng, itemLat, itemLng
 
-    function handleNavigateToSpecifiedItemList() {
-        navigation.navigate("SpecifiedItemList")
+    useEffect(() => {
+        loadItems()
+    }, [])
+
+    function loadItems() {
+        setItemArray([])
+        var ref = firebase.database().ref("items");      
+        ref.on("value", function (snapshot) {
+            snapshot.forEach((item) => {
+                let images = []
+                item.val().imageNames.map((image) => {
+                    images.push(image)
+                })
+                const itemInterface = {
+                    id: item.val().id,
+                    title: item.val().title,
+                    description: item.val().description,
+                    imageNames: images,
+                    inTradeItems: item.val().inTradeItems,
+                    user_id: item.val().user_id,
+                    location: item.val().location,
+                }
+                // if (itemInterface.user_id != user.uid) {
+                    setItemArray((oldArray) => [...oldArray, itemInterface])
+                // }  
+            })
+        })
+    }
+
+    async function distance(lat1, lon1, lat2, lon2) {
+        var p = 0.017453292519943295;    // Math.PI / 180
+        var c = Math.cos;
+        var a = 0.5 - c((lat2 - lat1) * p)/2 + 
+                c(lat1 * p) * c(lat2 * p) * 
+                (1 - c((lon2 - lon1) * p))/2;
+      
+        return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
+    }
+
+
+    function handleNavigateToSpecifiedItemList(item) {
+        navigation.navigate("SpecifiedItemList", {item})
     }
 
     return (
@@ -20,49 +66,14 @@ export default function Home({ route, navigation }) {
                         placeholderTextColor= 'gray'
                         iconColor="#ffd731"
                     />
-                    <Card style={styles.card} acessible={true} onPress={(id) => handleNavigateToSpecifiedItemList(id)}>
-                        <Card.Content>
-                            <Card.Cover source={{ uri: 'https://vitasuco.com.br/wp-content/uploads/2020/08/capa_blog_vita_suco.png' }} />
-                            <Title style={styles.cardTitle} >test</Title>
-                            <Paragraph style={styles.cardParagraph}>testsdfjhasojkdhfasljkdfhlsuaidfhjksdhflkjasdhfasdjkh</Paragraph>
-                        </Card.Content>
-                    </Card>
-                    <Card style={styles.card} acessible={false}>
-                        <Card.Content>
-                            <Title style={styles.cardTitle} >test</Title>
-                            <Paragraph style={styles.cardParagraph}>test</Paragraph>
-                        </Card.Content>
-                    </Card>
-                    <Card style={styles.card} acessible={false}>
-                        <Card.Content>
-                            <Title style={styles.cardTitle} >test</Title>
-                            <Paragraph style={styles.cardParagraph}>test</Paragraph>
-                        </Card.Content>
-                    </Card>
-                    <Card style={styles.card} acessible={false}>
-                        <Card.Content>
-                            <Title style={styles.cardTitle} >test</Title>
-                            <Paragraph style={styles.cardParagraph}>test</Paragraph>
-                        </Card.Content>
-                    </Card>
-                    <Card style={styles.card} acessible={false}>
-                        <Card.Content>
-                            <Title style={styles.cardTitle} >test</Title>
-                            <Paragraph style={styles.cardParagraph}>test</Paragraph>
-                        </Card.Content>
-                    </Card>
-                    <Card style={styles.card} acessible={false}>
-                        <Card.Content>
-                            <Title style={styles.cardTitle} >test</Title>
-                            <Paragraph style={styles.cardParagraph}>test</Paragraph>
-                        </Card.Content>
-                    </Card>
-                    <Card style={styles.card} acessible={false}>
-                        <Card.Content>
-                            <Title style={styles.cardTitle} >test</Title>
-                            <Paragraph style={styles.cardParagraph}>test</Paragraph>
-                        </Card.Content>
-                    </Card>
+                    {itemArray.map((item) => (
+                        <Card key={item.id} style={styles.card} acessible={false} onPress={() => handleNavigateToSpecifiedItemList(item)}>
+                            <Card.Content>
+                                <Title style={styles.cardTitle}>{item.title}</Title>
+                                <Paragraph style={styles.cardParagraph}>{item.description}</Paragraph>
+                            </Card.Content>
+                        </Card>
+                    ))}
                 </ScrollView>
             </SafeAreaView>
         </View>
@@ -78,6 +89,7 @@ const styles = StyleSheet.create({
     },
     
     safeAreaView: {
+        width: "100%",
         marginTop: "-8%",
         alignItems: "flex-start",
         justifyContent: "center"

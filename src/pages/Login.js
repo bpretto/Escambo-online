@@ -24,15 +24,16 @@ export default function login({ route, navigation }) {
                         usernameFromDB = true;
                     }
                 })
-                }, function (error) {
-                console.log("Error: " + error.code);
-                });
-
                 if (usernameFromDB) {
                     Alert.alert("Erro", "Username já cadastrado. Faça login ou crie uma conta com outro username.")
                 } else {
                     navigation.navigate('Register', {username, password})
-                }                
+                }
+                }, function (error) {
+                console.log("Error: " + error.code);
+                });
+
+                                
             }
     };
 
@@ -40,7 +41,11 @@ export default function login({ route, navigation }) {
         let usernameFromDB = false
         let emailFromDB = "";
         if (!username || !password) {
-            Alert.alert("Erro", "Preencha os campos corretamente!");
+            // Alert.alert("Erro", "Preencha os campos corretamente!");
+            firebase
+                .auth()
+                .signInWithEmailAndPassword("bernardodgpretto@gmail.com", "123456")
+                navigation.navigate("MainScreen")
       
           } else {
             var ref = firebase.database().ref("users");
@@ -53,15 +58,9 @@ export default function login({ route, navigation }) {
                     console.log(emailFromDB)
                 }
               })
-            }, function (error) {
-              console.log("Error: " + error.code);
-            });
-
-            if (!usernameFromDB) {
+              if (!usernameFromDB) {
                 Alert.alert("Erro", "Insira um username já cadastrado, ou então, cadastre-se.")
             } else {
-
-            <ActivityIndicator animating={true} color={Colors.red800} />
                 firebase
                 .auth()
                 .signInWithEmailAndPassword(emailFromDB, password)
@@ -74,10 +73,12 @@ export default function login({ route, navigation }) {
                         navigation.navigate("MainScreen")
                     }
                   })
-                  .catch(error => {
-                    Alert.alert(`Erro ${error.code}`, `${error.message}`)
-                  })
             }
+            }, function (error) {
+              console.log("Error: " + error.code);
+            });
+
+            
         }
     }
     

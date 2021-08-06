@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
-import { StyleSheet, View, TextInput, Text, Image } from "react-native";
+import { StyleSheet, View, TextInput, Text, Image, TouchableOpacity } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { Button, Card, Dialog, IconButton, Paragraph, Portal, Searchbar, Title } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Fire from "../../components/Fire";
 import firebase from "firebase"
+
 
 export default function OwnItemList({ route, navigation }) {
 
@@ -12,30 +13,22 @@ export default function OwnItemList({ route, navigation }) {
     const [refreshPage, setRefreshPage] = React.useState(0);
     const [deleteVisible, setDeleteVisible] = React.useState(false);
     const [images, setImages] = React.useState([]);
+    
 
     useEffect(() => {
         imageStorage()
-    },[])
-    async function imageStorage() {
+    }, [refreshPage])
+    async function imageStorage() {    
         try {
-            console.log(item.imageNames)
-            // let image = item.imageNames[0]
-            // let imageFromDB = await firebase.storage().ref("images").child(image).getDownloadURL();
-            //     setImages(images.concat(imageFromDB))
-            //     console.log(imageFromDB)
-            console.log("chorane",item.imageNames)
-            item.imageNames.map(async (imageName) => {
-                console.log("this."+imageName)
-            })
             item.imageNames.map(async (imageName) => {
                 const image = await firebase.storage().ref("images").child(imageName).getDownloadURL();
-                setImages(images.concat(image))
+                setImages((oldArray) => [...oldArray, image])
             })
         } catch (error) {
             console.log(error);
         }
     }
-
+    
     function handleNavigateToEditOwnItem() {
         navigation.navigate("EditOwnItem", { item })
     }
@@ -92,34 +85,38 @@ export default function OwnItemList({ route, navigation }) {
                             showsHorizontalScrollIndicator={false}
                             contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
                         >
-                            {images.map((lepo) => (
-                                <Image 
-                                    style={styles.image}
-                                    source={{
-                                        uri: lepo,
-                                        cache: "default",
-                                        width:300
-                                    }}
-                                /> 
-                            ))}
-                                
-                            <Image 
-                                style={styles.image}
-                                source={{
-                                    uri: images[0],
-                                    cache: "default",
-                                    width:300
-                                }}
-                            />
+                            {images.length > 2 
+                                ? images.map((image) => (
+                                    <View>
+                                        <Image 
+                                        style={styles.image}
+                                        source={{
+                                            uri: image,
+                                            cache: "default",
+                                            width: 300, height: 300
+                                        }}
+                                        />
+                                    </View>
+                                ))
+                                :   <View>
+                                        <Image
+                                        source={{
+                                            uri: images[0],
+                                            cache: "default",
+                                            width: 300, height: 300
+                                        }}
+                                        />
+                                    </View>
+                            }
                         </ScrollView>
                     </SafeAreaView>
 
             
                     <View style={styles.divider}>
                         <Text style={styles.fieldTitle}>Descrição</Text>
-                        <Text style={styles.fieldText}>{item.description}</Text>
-                        
+                        <Text style={styles.fieldText}>{item.description}</Text>                        
                     </View>
+                    
                     <View style={styles.divider}>
                         <Text style={styles.fieldTitle}>O que quero em troca?</Text>
                         <Text style={styles.fieldText}>{item.inTradeItems}</Text>
@@ -166,6 +163,10 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
 
+    imageContainer: {
+        marginLeft: 10    
+    },
+
     safeAreaView: {
         width: "100%",
         marginTop: "-8%",
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
     },
 
     image: {
-        marginRight: 20
+        marginRight: 20,
     },
 
     divider: {

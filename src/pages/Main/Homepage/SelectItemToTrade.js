@@ -1,14 +1,40 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, View, TextInput, Text, Image } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { Button, Card, IconButton, Paragraph, Searchbar, Title, FAB, Portal, Dialog } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import firebase from "firebase";
+import Fire from "../../../components/Fire";
 
 export default function SpecifiedItemList({ route, navigation }) {
 
-    // const { id } = route.params; 
+    const { item } = route.params;
+    const [itemArray, setItemArray] = React.useState([]);
     const [confirmVisible, setConfirmVisible] = React.useState(false);
-    const [confirmationVisible, setConfirmationVisible] = React.useState(false);    
+    const [confirmationVisible, setConfirmationVisible] = React.useState(false);
+    const user = firebase.auth().currentUser;
+    
+    useEffect(() => {
+        getUserItems()
+    })
+
+    async function getUserItems() {
+        setItemArray([])
+        var ref = firebase.database().ref("items");      
+        ref.on("value", function (snapshot) {
+            snapshot.forEach((item) => {
+                if (item.val().user_id == user.uid) {
+                    const itemInterface = {
+                        id: item.val().id,
+                        title: item.val().title,
+                        description: item.val().description
+                    }
+
+                    setItemArray((oldArray) => [...oldArray, itemInterface])
+                } 
+            })
+        })
+    }
 
     function handleNavigateToCreateNewItem() {
         navigation.navigate("CreateNewItem")
@@ -18,10 +44,18 @@ export default function SpecifiedItemList({ route, navigation }) {
         setConfirmVisible(true)
     }
 
-    function handleSendTrade() {
-        setConfirmVisible(false)
-        //firebase
-        setConfirmationVisible(true)
+    function handleSendTrade(one) {
+        try {
+            Fire.save("trades", {
+                requested_item_id: item.id,
+                requested_user_id: item.user_id,
+                requesting_item_id: one.id,
+                requesting_user_id: user.uid
+            })
+            setConfirmationVisible(true)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     function handleCancel() {
@@ -60,40 +94,17 @@ export default function SpecifiedItemList({ route, navigation }) {
                             <Paragraph style={styles.cardParagraph}>testsdfjhasojkdhfasljkdfhlsuaidfhjksdhflkjasdhfasdjkh</Paragraph>
                         </Card.Content>
                     </Card>
+
+                    {itemArray.map((one) => (
+                        <Card key={one.id} style={styles.card} acessible={false} onPress={() => handleSendTrade(one)}>
+                            <Card.Content>
+                                <Title style={styles.cardTitle}>{item.title}</Title>
+                                <Paragraph style={styles.cardParagraph}>{item.description}</Paragraph>
+                            </Card.Content>
+                        </Card>
+                    ))}
                 </ScrollView>
             </SafeAreaView>
-
-            <Portal>
-                <Dialog visible={confirmVisible} dismissable={true} onDismiss={handleCancel}>
-                    <Dialog.Title>Você tem certeza?</Dialog.Title>
-                    <Dialog.Content>
-                        <Text style={styles.dialogText}>
-                            Deseja trocar seu 
-                            <Text style={styles.dialogTextBold}>
-                                {" ITEM AQUI "}
-                            </Text>
-                            pelo item?
-                        </Text>
-                        <Button
-                            icon="check"
-                            mode="contained"
-                            dark={true}
-                            onPress={handleSendTrade}
-                        >
-                            Confirmar
-                        </Button>
-                        <Button
-                            icon="cancel"
-                            mode="contained"
-                            dark={true}
-                            onPress={handleCancel}
-                            style={styles.cancelButton}
-                        >
-                            Cancelar
-                        </Button>
-                    </Dialog.Content>
-                </Dialog>
-            </Portal>
 
             <Portal>
                 <Dialog visible={confirmationVisible} dismissable={true} onDismiss={handleHideConfirmation}>

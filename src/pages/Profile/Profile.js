@@ -55,7 +55,7 @@ export default function Profile({ route, navigation }) {
                 inTradeItems: item.val().inTradeItems,
                 sent: item.val().sent,
                 received: item.val().received,
-                username: item.val().username
+                user_id: item.val().user_id
             };
             itemArray.push(card)
         }
@@ -147,7 +147,7 @@ export default function Profile({ route, navigation }) {
             <Text style={styles.title}>Meus itens</Text>
 
             {itemArray.map((item) => (
-                    <TouchableOpacity style={styles.card} onPress={() => handleNavigateToOwnItemList(item.id)}>
+                    <TouchableOpacity key={item.id} style={styles.card} onPress={() => handleNavigateToOwnItemList(item.id)}>
                     <View style={styles.columnLeft}>
                         <Text style={styles.leftText}>{item.title}</Text>
                     </View>
