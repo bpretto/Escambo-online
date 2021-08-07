@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { StyleSheet, View, TextInput, Text, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, Image } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import { Button, Card, Dialog, IconButton, Paragraph, Portal, Searchbar, Title } from "react-native-paper";
+import { Button } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Fire from "../../../components/Fire";
 import firebase from "firebase"
@@ -10,8 +10,6 @@ import firebase from "firebase"
 export default function OwnItemList({ route, navigation }) {
 
     const { item } = route.params;
-    const [refreshPage, setRefreshPage] = React.useState(0);
-    const [deleteVisible, setDeleteVisible] = React.useState(false);
     const [images, setImages] = React.useState([]);
     const [name, setName] = React.useState([]);
     
@@ -46,20 +44,6 @@ export default function OwnItemList({ route, navigation }) {
         navigation.navigate("SelectItemToTrade", { item })
     }
 
-    function handleDelete() {
-        setDeleteVisible(true)
-    }
-
-    function handleConfirm() {
-        setDeleteVisible(false)
-        Fire.remove("items", item.id)
-        navigation.navigate("MainScreen")
-    }
-
-    function handleHideDelete() {
-        setDeleteVisible(false)
-    }
-
     return (
         <View style={styles.container}>
 
@@ -92,7 +76,7 @@ export default function OwnItemList({ route, navigation }) {
                         >
                             {images.length > 2 
                                 ? images.map((image) => (
-                                    <View>
+                                    <View key={image} >
                                         <Image 
                                         style={styles.image}
                                         source={{
@@ -199,10 +183,4 @@ const styles = StyleSheet.create({
         marginBottom: 30,
         fontSize: 15
     },
-
-    buttonDelete: {
-        backgroundColor: "#FF3838",
-        marginTop: 5
-    },
-
 });

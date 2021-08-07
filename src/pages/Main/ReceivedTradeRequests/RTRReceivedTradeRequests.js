@@ -1,15 +1,45 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, View, Text, TextInput, Image } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { Button, IconButton } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import firebase from "firebase"
 
 import trade from "../../../images/logoredonda.png"
 
 export default function ReceivedTradeRequests({ route, navigation }) {
 
-    function handleNavigateToSpecifiedItemList() {
-        navigation.navigate("RTRSpecifiedItemList")
+    const [itemArray, setItemArray] = React.useState([]);
+    const user = firebase.auth().currentUser;
+
+    useEffect(() => {
+        getReceivedTradeRequests()
+    }, [])
+
+    async function getReceivedTradeRequests() {   
+        firebase.database().ref("trades").on("value", function (snapshot) {
+            setItemArray([])
+            snapshot.forEach((one) => {
+                if (one.val().requested_user_id == user.uid) {
+                    const itemInterface = {
+                        id: one.val().id,
+                        requested_item_id: one.val().requested_item_id,
+                        requested_item_title: one.val().requested_item_title,
+                        requesting_item_title: one.val().requesting_item_title,
+                        requesting_item_id: one.val().requesting_item_id,
+                        requesting_user_id: one.val().requesting_user_id,
+                    }
+
+                    console.log(itemInterface)
+
+                    setItemArray((oldArray) => [...oldArray, itemInterface])
+                } 
+            })
+        })
+    }
+
+    function handleNavigateToSpecifiedItemList(one) {
+        navigation.navigate("RTRSpecifiedItemList", {one})
     }
 
     return (
@@ -17,40 +47,30 @@ export default function ReceivedTradeRequests({ route, navigation }) {
             <SafeAreaView style={styles.safeAreaView}>
                 <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }} style={styles.scrollView} showsVerticalScrollIndicator={false}>
                     <Text style={styles.pageTitle}>Propostas de troca com seus itens</Text>
-                    <View style={styles.card}>
-                        <View style={styles.line}>
-                            <Text style={styles.leftText}>Você dá:</Text>
-                            <Text style={styles.rightText}>Em troca de:</Text>
+                    {itemArray.map((one) => (
+                        <View key={one.id} style={styles.card}>
+                            <View style={styles.line}>
+                                <Text style={styles.leftText}>Você dá:</Text>
+                                <Text style={styles.rightText}>Em troca de:</Text>
+                            </View>
+                            <View style={styles.line}>
+                                <Text style={styles.leftDynamicText}>{one.requested_item_title}</Text>
+                                <Image source={trade} style={styles.trade} />
+                                <Text style={styles.rightDynamicText}>{one.requesting_item_title}</Text>
+                            </View>
+                            <View style={styles.line}>
+                                <View/>
+                                <Button
+                                    icon="eye"
+                                    mode="contained"
+                                    dark={true}
+                                    onPress={() => handleNavigateToSpecifiedItemList(one)}
+                                >
+                                    Vizualizar
+                                </Button>
+                            </View>
                         </View>
-                        <View style={styles.line}>
-                            <Text style={styles.leftDynamicText}>Relógio Couro</Text>
-                            <Image source={trade} style={styles.trade} />
-                            <Text style={styles.rightDynamicText}>Porco Vivo</Text>
-                        </View>
-                        <View style={styles.line}>
-                            <View/>
-                            <Button
-                                icon="eye"
-                                mode="contained"
-                                dark={true}
-                                onPress={handleNavigateToSpecifiedItemList}
-                            >
-                                Vizualizar
-                            </Button>
-                        </View>
-                    </View>
-
-                    <View style={styles.card}>
-                        <View style={styles.line}>
-                            <Text style={styles.leftText}>Você dá:</Text>
-                            <Text style={styles.rightText}>Em troca de:</Text>
-                        </View>
-                        <View style={styles.line}>
-                            <Text style={styles.leftDynamicText}>Relógio Couro</Text>
-                            <Image source={trade} style={styles.trade} />
-                            <Text style={styles.rightDynamicText}>Porco Vivo</Text>
-                        </View>
-                    </View>
+                    ))}
                 </ScrollView>
             </SafeAreaView>
         </View>

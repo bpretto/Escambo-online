@@ -1,16 +1,85 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, View, TextInput, Text, Image } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import { Button, Card, Dialog, IconButton, Paragraph, Portal, Searchbar, Title } from "react-native-paper";
+import { Button, Dialog, Portal } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import firebase from "firebase";
+import Fire from "../../../components/Fire";
 
 export default function RTRSpecifiedItemList({ route, navigation }) {
 
-    // const { id } = route.params;
+    const { one: trade } = route.params;
+    const [contactVisible, setContactVisible] = React.useState(false);
     const [cancelVisible, setCancelVisible] = React.useState(false);
+    const [item, setItem] = React.useState({
+        id: null,
+        title: null,
+        description: null,
+        imageNames: null,
+        inTradeones: null,
+        user_id: null,
+        location: null,
+    });
+    const [user, setUser] = React.useState("");
+    const [images, setImages] = React.useState([]);
+
+    useEffect(() => {
+        getItem()
+        getUser()
+    }, [])
+
+    async function getItem() {
+        firebase.database().ref("items").on("value", function (snapshot) {
+            snapshot.forEach((one) => {
+                if (one.val().id == trade.requesting_item_id) {
+                    let images = []
+                    one.val().imageNames.map((image) => {
+                        images.push(image)
+                    })
+                    const itemInterface = {
+                        id: one.val().id,
+                        title: one.val().title,
+                        description: one.val().description,
+                        imageNames: images,
+                        inTradeones: one.val().inTradeItems,
+                        user_id: one.val().user_id,
+                        location: one.val().location,
+                    }
+                    imageStorage(itemInterface)
+                    setItem(itemInterface);
+                } 
+            })
+        })
+    }
+
+    async function getUser() {   
+        firebase.database().ref("users").on("value", function (snapshot) {
+            snapshot.forEach((one) => {
+                if (one.val().id == trade.requesting_user_id) {
+                    
+                    setUser({
+                        name: one.val().name,
+                        tel: one.val().tel
+                    });
+                } 
+            })
+        })
+    }
+
+    function imageStorage(itemInterface) {    
+        try {
+            console.log("aqui", itemInterface)
+            itemInterface.imageNames.map(async (imageName) => {
+                const image = await firebase.storage().ref("images").child(imageName).getDownloadURL();
+                setImages((oldArray) => [...oldArray, image])
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     function handleShowContact() {
-
+        setContactVisible(true)
     }
 
     function handleRefuse() {
@@ -19,7 +88,13 @@ export default function RTRSpecifiedItemList({ route, navigation }) {
 
     function handleConfirm() {
         setCancelVisible(false)
-        //firebase
+        try {
+            Fire.remove("trades", trade.id);
+            navigation.goBack()
+        } catch (error) {
+            console.log(error)
+        }
+        
     }
 
     function handleHideCancel() {
@@ -34,8 +109,8 @@ export default function RTRSpecifiedItemList({ route, navigation }) {
 
                     <View style={styles.head}>
                         <View style={styles.column}>
-                            <Text style={styles.title}>Iphone 6 32gb</Text>
-                            <Text>Vitoria Carolina</Text>
+                            <Text style={styles.title}>{item.title}</Text>
+                            <Text>{user.name}</Text>
                         </View>
                         <View style={styles.column}>
                             <Button
@@ -64,22 +139,29 @@ export default function RTRSpecifiedItemList({ route, navigation }) {
                             showsHorizontalScrollIndicator={false}
                             contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
                         >
-                            <Image 
-                                style={styles.image}
-                                source={{
-                                    uri: "https://vitasuco.com.br/wp-content/uploads/2020/08/capa_blog_vita_suco.png",
-                                    cache: "default",
-                                    width:300
-                                }}
-                            />
-                            <Image 
-                                style={styles.image}
-                                source={{
-                                    uri: "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/runningfeet-1446281102.jpg",
-                                    cache: "default",
-                                    width:300
-                                }}
-                            />
+                            {images.length > 2 
+                                ? images.map((image) => (
+                                    <View key={image}>
+                                        <Image 
+                                        style={styles.image}
+                                        source={{
+                                            uri: image,
+                                            cache: "default",
+                                            width: 300, height: 300
+                                        }}
+                                        />
+                                    </View>
+                                ))
+                                :   <View>
+                                        <Image
+                                        source={{
+                                            uri: images[0],
+                                            cache: "default",
+                                            width: 300, height: 300
+                                        }}
+                                        />
+                                    </View>
+                            }
                         </ScrollView>
                     </SafeAreaView>
 
@@ -120,6 +202,17 @@ export default function RTRSpecifiedItemList({ route, navigation }) {
                         >
                             Não
                         </Button>
+                    </Dialog.Content>
+                </Dialog>
+            </Portal>
+
+            <Portal>
+                <Dialog visible={contactVisible} dismissable={true} onDismiss={() => setContactVisible(false)}>
+                    <Dialog.Title>Contato</Dialog.Title>
+                    <Dialog.Content>
+                        <Text style={styles.dialogText}>
+                            {user.tel}
+                        </Text>
                     </Dialog.Content>
                 </Dialog>
             </Portal>

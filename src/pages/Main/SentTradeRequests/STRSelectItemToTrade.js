@@ -1,35 +1,65 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, View, TextInput, Text, Image } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { Button, Card, IconButton, Paragraph, Searchbar, Title, FAB, Portal, Dialog } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import firebase from "firebase";
+import Fire from "../../../components/Fire";
 
-export default function SpecifiedItemList({ route, navigation }) {
+export default function STRSelectItemToTrade({ route, navigation }) {
 
-    // const { id } = route.params; 
-    const [confirmVisible, setConfirmVisible] = React.useState(false);
-    const [confirmationVisible, setConfirmationVisible] = React.useState(false);    
+    const { one: trade } = route.params;
+    const [itemArray, setItemArray] = React.useState([]);
+    const [confirmationVisible, setConfirmationVisible] = React.useState(false);
+    const user = firebase.auth().currentUser;
+    
+    useEffect(() => {
+        getUserItems()
+    })
+
+    async function getUserItems() {
+        setItemArray([])
+        var ref = firebase.database().ref("items");      
+        ref.on("value", function (snapshot) {
+            snapshot.forEach((item) => {
+                if (item.val().user_id == user.uid) {
+                    const itemInterface = {
+                        id: item.val().id,
+                        title: item.val().title,
+                        description: item.val().description
+                    }
+
+                    setItemArray((oldArray) => [...oldArray, itemInterface])
+                } 
+            })
+        })
+    }
 
     function handleNavigateToCreateNewItem() {
         navigation.navigate("CreateNewItem")
     }
 
-    function handleShowConfirmationDialog(id) {
-        setConfirmVisible(true)
-    }
-
-    function handleSendTrade() {
-        setConfirmVisible(false)
-        //firebase
-        setConfirmationVisible(true)
-    }
-
-    function handleCancel() {
-        setConfirmVisible(false)
+    function handleSendTrade(one) {
+        try {
+            console.log(trade)
+            Fire.update("trades", {
+                id: trade.id,
+                requested_item_id: trade.requested_item_id,
+                requested_item_title: trade.requested_item_title,
+                requested_user_id: trade.requested_user_id,
+                requesting_item_id: one.id,
+                requesting_item_title: one.title,
+                requesting_user_id: user.uid
+            })
+            setConfirmationVisible(true)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     function handleHideConfirmation() {
         setConfirmationVisible(false)
+        navigation.goBack()
     }
 
     return (
@@ -39,61 +69,17 @@ export default function SpecifiedItemList({ route, navigation }) {
                 <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }} style={styles.scrollView} showsVerticalScrollIndicator={false}>
                     <Text style={styles.title}>Selecione um item para oferecer na troca</Text>
 
-                    <Card style={styles.card} acessible={true} onPress={(id) => handleShowConfirmationDialog(id)}>
-                        <Card.Content>
-                            <Card.Cover source={{ uri: 'https://vitasuco.com.br/wp-content/uploads/2020/08/capa_blog_vita_suco.png' }} />
-                            <Title style={styles.cardTitle} >test</Title>
-                            <Paragraph style={styles.cardParagraph}>testsdfjhasojkdhfasljkdfhlsuaidfhjksdhflkjasdhfasdjkh</Paragraph>
-                        </Card.Content>
-                    </Card>
-                    <Card style={styles.card} acessible={true} onPress={(id) => handleNavigateToSpecifiedItemList(id)}>
-                        <Card.Content>
-                            <Card.Cover source={{ uri: 'https://vitasuco.com.br/wp-content/uploads/2020/08/capa_blog_vita_suco.png' }} />
-                            <Title style={styles.cardTitle} >test</Title>
-                            <Paragraph style={styles.cardParagraph}>testsdfjhasojkdhfasljkdfhlsuaidfhjksdhflkjasdhfasdjkh</Paragraph>
-                        </Card.Content>
-                    </Card>
-                    <Card style={styles.card} acessible={true} onPress={(id) => handleShowConfirmationDialog(id)}>
-                        <Card.Content>
-                            <Card.Cover source={{ uri: 'https://vitasuco.com.br/wp-content/uploads/2020/08/capa_blog_vita_suco.png' }} />
-                            <Title style={styles.cardTitle} >test</Title>
-                            <Paragraph style={styles.cardParagraph}>testsdfjhasojkdhfasljkdfhlsuaidfhjksdhflkjasdhfasdjkh</Paragraph>
-                        </Card.Content>
-                    </Card>
+                    {itemArray.map((one) => (
+                        <Card key={one.id} style={styles.card} acessible={false} onPress={() => handleSendTrade(one)}>
+                            <Card.Content>
+                                <Title style={styles.cardTitle}>{one.title}</Title>
+                                <Paragraph style={styles.cardParagraph}>{one.description}</Paragraph>
+                            </Card.Content>
+                        </Card>
+                    ))}
+
                 </ScrollView>
             </SafeAreaView>
-
-            <Portal>
-                <Dialog visible={confirmVisible} dismissable={true} onDismiss={handleCancel}>
-                    <Dialog.Title>Você tem certeza?</Dialog.Title>
-                    <Dialog.Content>
-                        <Text style={styles.dialogText}>
-                            Deseja trocar seu 
-                            <Text style={styles.dialogTextBold}>
-                                {" ITEM AQUI "}
-                            </Text>
-                            pelo item?
-                        </Text>
-                        <Button
-                            icon="check"
-                            mode="contained"
-                            dark={true}
-                            onPress={handleSendTrade}
-                        >
-                            Confirmar
-                        </Button>
-                        <Button
-                            icon="cancel"
-                            mode="contained"
-                            dark={true}
-                            onPress={handleCancel}
-                            style={styles.cancelButton}
-                        >
-                            Cancelar
-                        </Button>
-                    </Dialog.Content>
-                </Dialog>
-            </Portal>
 
             <Portal>
                 <Dialog visible={confirmationVisible} dismissable={true} onDismiss={handleHideConfirmation}>

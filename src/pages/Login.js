@@ -14,7 +14,7 @@ export default function login({ route, navigation }) {
     function handleNavigateToRegister() {
         let usernameFromDB = false
         if (!username || !password) {
-            Dialog("Erro", "Preencha os campos corretamente!");        
+            Alert.alert("Erro", "Preencha os campos corretamente!");
             } else {
                 var ref = firebase.database().ref("users");
       
@@ -32,8 +32,6 @@ export default function login({ route, navigation }) {
                 }, function (error) {
                 console.log("Error: " + error.code);
                 });
-
-                                
             }
     };
 
@@ -41,12 +39,7 @@ export default function login({ route, navigation }) {
         let usernameFromDB = false
         let emailFromDB = "";
         if (!username || !password) {
-            // Alert.alert("Erro", "Preencha os campos corretamente!");
-            firebase
-                .auth()
-                .signInWithEmailAndPassword("bernardodgpretto@gmail.com", "123456")
-                navigation.navigate("MainScreen")
-      
+            Alert.alert("Erro", "Preencha os campos corretamente!");
           } else {
             var ref = firebase.database().ref("users");
       
