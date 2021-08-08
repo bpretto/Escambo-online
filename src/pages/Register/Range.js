@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, StyleSheet, TextInput, View, Slider, Text, Alert } from "react-native";
+import { Image, StyleSheet, View, Slider, Text, Alert } from "react-native";
 import { Button } from "react-native-paper";
 import Fire from "../../components/Fire"
 import firebase from "firebase"

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { StyleSheet, View, TextInput, Text, Image } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import { Button, Card, IconButton, Paragraph, Searchbar, Title, FAB, Portal, Dialog } from "react-native-paper";
+import { Button, Card, Paragraph, Title, FAB, Portal, Dialog } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import firebase from "firebase";
 import Fire from "../../../components/Fire";

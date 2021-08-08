@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { StyleSheet, View, TextInput, Text, Image } from "react-native";
+import { StyleSheet, View, Text, Image } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { Button, Dialog, Portal } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";

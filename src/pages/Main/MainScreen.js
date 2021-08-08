@@ -1,8 +1,8 @@
 import React from "react";
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { Icon } from "react-native-elements"
-import { StyleSheet, View, Image } from "react-native";
-import { IconButton, TextInput } from "react-native-paper";
+import { StyleSheet, Image } from "react-native";
+import { IconButton } from "react-native-paper";
 import { createStackNavigator } from "@react-navigation/stack"; 
 
 import Home from "./Homepage/Home"

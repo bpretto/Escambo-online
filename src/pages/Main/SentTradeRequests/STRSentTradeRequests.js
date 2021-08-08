@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { StyleSheet, View, Text, TextInput, Image } from "react-native";
+import { StyleSheet, View, Text, Image } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import { Button, IconButton } from "react-native-paper";
+import { Button } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Fire from "../../../components/Fire"
 import firebase from "firebase"

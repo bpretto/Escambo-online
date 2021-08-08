@@ -26,7 +26,13 @@ export default function SpecifiedItemList({ route, navigation }) {
                     const itemInterface = {
                         id: item.val().id,
                         title: item.val().title,
-                        description: item.val().description
+                        description: item.val().description,
+                        imageNames: images,
+                        inTradeItems: item.val().inTradeItems,
+                        user_id: item.val().user_id,
+                        location: item.val().location,
+                        sent: item.val().sent,
+                        received: item.val().received
                     }
 
                     setItemArray((oldArray) => [...oldArray, itemInterface])
@@ -49,6 +55,33 @@ export default function SpecifiedItemList({ route, navigation }) {
                 requesting_item_id: one.id,
                 requesting_user_id: user.uid
             })
+
+            Fire.update("items", {
+                id: item.id,
+                title: item.title,
+                description: item.description,
+                imageNames: item.imageNames,
+                inTradeItems: item.inTradeItems,
+                user_id: item.user_id,
+                location: item.location,
+                sent: item.sent,
+                received: (item.received + 1)
+            })
+
+            Fire.update("items", {
+                id: one.id,
+                title: one.title,
+                description: one.description,
+                imageNames: one.imageNames,
+                inTradeItems: one.inTradeItems,
+                user_id: one.user_id,
+                location: one.location,
+                sent: (one.sent + 1),
+                received: one.received
+            })
+
+
+
             setConfirmationVisible(true)
         } catch (error) {
             console.log(error)

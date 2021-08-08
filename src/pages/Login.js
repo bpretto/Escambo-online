@@ -1,7 +1,6 @@
 import React from "react";
 import { Alert, Image, StyleSheet, TextInput, View } from "react-native";
-import { ActivityIndicator, Colors } from 'react-native-paper';
-import { Button, Dialog } from "react-native-paper";
+import { Button } from "react-native-paper";
 import firebase from "firebase"
 import logo from "../images/logo.png"
 

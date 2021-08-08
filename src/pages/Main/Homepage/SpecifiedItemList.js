@@ -3,21 +3,20 @@ import { StyleSheet, View, Text, Image } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { Button } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Fire from "../../../components/Fire";
 import firebase from "firebase"
 
 
-export default function OwnItemList({ route, navigation }) {
+export default function SpecifiedItemList({ route, navigation }) {
 
     const { item } = route.params;
     const [images, setImages] = React.useState([]);
     const [name, setName] = React.useState([]);
-    
 
     useEffect(() => {
         imageStorage()
         getName()
     }, [])
+
     async function imageStorage() {    
         try {
             item.imageNames.map(async (imageName) => {

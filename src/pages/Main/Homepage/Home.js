@@ -34,6 +34,8 @@ export default function Home({ route, navigation }) {
                         inTradeItems: item.val().inTradeItems,
                         user_id: item.val().user_id,
                         location: item.val().location,
+                        sent: item.val().sent,
+                        received: item.val().received
                     }
                     
                         setItemArray((oldArray) => [...oldArray, itemInterface])

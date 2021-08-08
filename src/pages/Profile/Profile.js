@@ -2,7 +2,6 @@ import React from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { Button, Dialog, Portal, TextInput } from "react-native-paper";
 import firebase from "firebase";
-import Fire from "../../components/Fire";
 
 export default function Profile({ route, navigation }) {
     
