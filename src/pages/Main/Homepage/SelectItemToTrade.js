@@ -27,7 +27,7 @@ export default function SpecifiedItemList({ route, navigation }) {
                         id: item.val().id,
                         title: item.val().title,
                         description: item.val().description,
-                        imageNames: images,
+                        imageNames: item.val().imageNames,
                         inTradeItems: item.val().inTradeItems,
                         user_id: item.val().user_id,
                         location: item.val().location,

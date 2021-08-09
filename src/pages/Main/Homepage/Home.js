@@ -17,9 +17,10 @@ export default function Home({ route, navigation }) {
     }, [])
 
     function loadItems() {
-        setItemArray([])
+        
         var ref = firebase.database().ref("items");      
         ref.on("value", function (snapshot) {
+            setItemArray([])
             snapshot.forEach((item) => {
                 if (item.val().user_id != user.uid) {
                     let images = []

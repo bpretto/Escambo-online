@@ -11,6 +11,7 @@ export default function SpecifiedItemList({ route, navigation }) {
     const { item } = route.params;
     const [images, setImages] = React.useState([]);
     const [name, setName] = React.useState([]);
+    const [refreshPage, setRefreshPage] = React.useState(0);
 
     useEffect(() => {
         imageStorage()
@@ -73,11 +74,9 @@ export default function SpecifiedItemList({ route, navigation }) {
                             showsHorizontalScrollIndicator={false}
                             contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
                         >
-                            {images.length > 2 
-                                ? images.map((image) => (
+                            {images.map((image) => (
                                     <View key={image} >
-                                        <Image 
-                                        style={styles.image}
+                                        <Image
                                         source={{
                                             uri: image,
                                             cache: "default",
@@ -86,15 +85,6 @@ export default function SpecifiedItemList({ route, navigation }) {
                                         />
                                     </View>
                                 ))
-                                :   <View>
-                                        <Image
-                                        source={{
-                                            uri: images[0],
-                                            cache: "default",
-                                            width: 300, height: 300
-                                        }}
-                                        />
-                                    </View>
                             }
                         </ScrollView>
                     </SafeAreaView>
@@ -162,10 +152,6 @@ const styles = StyleSheet.create({
     imageScrollView: {
         padding: 10,
         backgroundColor: "#ffd731",
-    },
-
-    image: {
-        marginRight: 20,
     },
 
     divider: {

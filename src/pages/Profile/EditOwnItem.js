@@ -11,8 +11,7 @@ import Fire from "../../components/Fire";
 
 export default function EditOwnItem({ route, navigation }) {
 
-    const { item } = route.params;
-    console.log(item)
+    const { item, images: imagesFromRoute } = route.params;
 
     const [refreshPage, setRefreshPage] = React.useState(0);
     const [confirmationVisible, setConfirmationVisible] = React.useState(false);
@@ -21,16 +20,16 @@ export default function EditOwnItem({ route, navigation }) {
     const [title, setTitle] = React.useState(item.title);
     const [description, setDescription] = React.useState(item.description);
     const [inTradeItems, setInTradeItems] = React.useState(item.inTradeItems);
-    const [images, setImages] = React.useState([]);
+    const [images, setImages] = React.useState(imagesFromRoute);
     const [upLoading, setUpLoading] = React.useState(null);
     let imageState;
 
     useEffect(() => {}, [images]);
 
     function handleRemoveImage(image) {
-        console.log(images)
         const index = images.indexOf(image)
         images.splice(index, 1)
+        console.log(images)
         setRefreshPage(refreshPage+1)
     }
 
@@ -45,7 +44,6 @@ export default function EditOwnItem({ route, navigation }) {
         })
 
             if(!image.cancelled) {
-                console.log(image)
                 imageState = image.uri
                 setImages(images.concat(imageState))
             }
@@ -57,56 +55,62 @@ export default function EditOwnItem({ route, navigation }) {
             setError(true)
         } else {
             try {
-                images.map(async (image) => {
-                    console.log(image)
-                    var randomString = '';
-                    const possibleLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-                    for (var i = 0; i < 15; i++) {
-                        randomString += possibleLetters.charAt(Math.floor(Math.random() * possibleLetters.length));
-                    }
-                    
-                    var storageRef = firebase.storage().ref();
-                    var imageRef = storageRef.child("images/" + randomString)
-                    
-                    const file = await new Promise((resolve, reject) => {
-                        const xhr = new XMLHttpRequest();
-                        xhr.onload = function () {
-                            resolve(xhr.response);            
+                let imageNames = item.imageNames;
+                console.log(images !== imagesFromRoute)
+                if (images != imagesFromRoute) {
+                    imageNames = []
+                    images.map(async (image) => {
+                        console.log(image)
+                        var randomString = '';
+                        const possibleLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                        for (var i = 0; i < 15; i++) {
+                            randomString += possibleLetters.charAt(Math.floor(Math.random() * possibleLetters.length));
+                        }
+                        
+                        var storageRef = firebase.storage().ref();
+                        var imageRef = storageRef.child("images/" + randomString);
+                        imageNames.push(randomString)
+                        
+                        const file = await new Promise((resolve, reject) => {
+                            const xhr = new XMLHttpRequest();
+                            xhr.onload = function () {
+                                resolve(xhr.response);            
+                            };
+    
+                            xhr.onerror = function () {
+                                reject(new Error("Erro!"));
+                            };
+    
+                            xhr.responseType = 'blob';
+                            xhr.open('GET', image, true);
+                            xhr.send(null);
+                        });
+                        
+                        var metadata = {
+                            contentType: 'image/jpeg'
                         };
-
-                        xhr.onerror = function () {
-                            reject(new Error("Erro!"));
-                        };
-
-                        xhr.responseType = 'blob';
-                        xhr.open('GET', image, true);
-                        xhr.send(null);
-                    });
-                    
-                    var metadata = {
-                        contentType: 'image/jpeg'
-                    };
-                    
-                    console.log(metadata, randomString)
-
-                    var uploadTask = await imageRef.put(file, metadata)
-
-                    uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, () => {
-                        setUpLoading(true)
-                    }, (error) => {
-                        setUpLoading(false)
-                        console.log(error)
-                        blob.close();
-                        return
-                    }, () => {
-                        snapshot.ref.getDonwloadURl().then((url) => {
+                        
+                        console.log(metadata, randomString)
+    
+                        var uploadTask = await imageRef.put(file, metadata)
+    
+                        uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, () => {
+                            setUpLoading(true)
+                        }, (error) => {
                             setUpLoading(false)
-                            console.log('download', url);
+                            console.log(error)
                             blob.close();
-                            return url;
-                        })
-                    });
-                }) 
+                            return
+                        }, () => {
+                            snapshot.ref.getDonwloadURl().then((url) => {
+                                setUpLoading(false)
+                                console.log('download', url);
+                                blob.close();
+                                return url;
+                            })
+                        });
+                    }) 
+                }
                 const user = firebase.auth().currentUser;
                 var ref = firebase.database().ref("users");
                 let location = null;
@@ -119,12 +123,15 @@ export default function EditOwnItem({ route, navigation }) {
                     })
                 })
 
-                Fire.save("items", {
-                    user_id: user.uid,                   
+                Fire.update("items", {
+                    id: item.id,
+                    user_id: user.uid, 
+                    sent: item.sent,
+                    received: item.received,       
                     title,
                     description,
                     inTradeItems,
-                    images,
+                    imageNames,                    
                     location
                 });
                 setConfirmationVisible(true)
@@ -137,6 +144,8 @@ export default function EditOwnItem({ route, navigation }) {
 
     function handleHideConfirmation() {
         setConfirmationVisible(false)
+        navigation.goBack()
+        navigation.goBack()
     }
 
 
